@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    proxy: {
+      '/npi-api': {
+        target: 'https://npiregistry.cms.hhs.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/npi-api/, '/api'),
+      }
+    }
   }
 })
-
