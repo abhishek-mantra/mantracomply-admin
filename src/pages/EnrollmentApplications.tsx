@@ -16,8 +16,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { StatusBadge } from '../components/StatusBadge';
-import { availableSpecialists } from '../data/mockData';
+import { availableSpecialists, enrollmentStatusOptions } from '../data/mockData';
 
 // Interactive Priority Dropdown Badge Component
 const PriorityBadge: React.FC<{
@@ -96,6 +95,165 @@ const PriorityBadge: React.FC<{
   );
 };
 
+// Interactive Enrollment Status Dropdown Badge Component
+const EnrollmentStatusBadge: React.FC<{
+  status: string;
+  onChange: (newStatus: string) => void;
+}> = ({ status, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const normalizedStatus = useMemo(() => {
+    if (status === 'ACTIVE') return 'Enrolled';
+    if (status === 'PENDING') return 'Pending';
+    if (status === 'SUBMITTED') return 'Submitted';
+    return status || 'Pending';
+  }, [status]);
+
+  const getStyle = (s: string) => {
+    switch (s) {
+      case 'Enrolled':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100';
+      case 'Pending':
+        return 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100';
+      case 'In Progress':
+        return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
+      case 'Submitted':
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100';
+      case 'Request form Submitted':
+        return 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100';
+      case 'LOI Submitted':
+        return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
+      case 'Network Status Verification':
+        return 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100';
+      case 'Need Information':
+        return 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100';
+      case 'Inactive':
+        return 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
+      case 'Network Close':
+        return 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200';
+      case 'On Hold':
+        return 'bg-yellow-50 text-yellow-800 border-yellow-300 hover:bg-yellow-100';
+      case 'Rejected':
+        return 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100';
+      case 'Not Accepting':
+        return 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100';
+      default:
+        return 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
+    }
+  };
+
+  const getDotColor = (s: string) => {
+    switch (s) {
+      case 'Enrolled':
+        return 'bg-emerald-500';
+      case 'Pending':
+        return 'bg-amber-500';
+      case 'In Progress':
+        return 'bg-blue-500';
+      case 'Submitted':
+        return 'bg-indigo-500';
+      case 'Request form Submitted':
+        return 'bg-sky-500';
+      case 'LOI Submitted':
+        return 'bg-purple-500';
+      case 'Network Status Verification':
+        return 'bg-teal-500';
+      case 'Need Information':
+        return 'bg-orange-500';
+      case 'Inactive':
+        return 'bg-slate-400';
+      case 'Network Close':
+        return 'bg-zinc-500';
+      case 'On Hold':
+        return 'bg-yellow-500';
+      case 'Rejected':
+        return 'bg-rose-500';
+      case 'Not Accepting':
+        return 'bg-red-600';
+      default:
+        return 'bg-slate-400';
+    }
+  };
+
+  const options = [
+    'Pending',
+    'In Progress',
+    'Submitted',
+    'Request form Submitted',
+    'LOI Submitted',
+    'Network Status Verification',
+    'Need Information',
+    'Enrolled',
+    'Inactive',
+    'Network Close',
+    'On Hold',
+    'Rejected',
+    'Not Accepting'
+  ];
+
+  return (
+    <div className="relative inline-block text-left" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`inline-flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide border transition-all cursor-pointer min-w-[120px] shadow-2xs whitespace-nowrap ${getStyle(
+          normalizedStatus
+        )}`}
+        title="Click to change status"
+      >
+        <span className="flex items-center gap-1.5 truncate max-w-[150px]">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getDotColor(normalizedStatus)}`} />
+          <span className="truncate">{normalizedStatus}</span>
+        </span>
+        <ChevronDown size={11} className="opacity-70 shrink-0 ml-1" />
+      </button>
+
+      {open && (
+        <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-64 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 font-semibold text-xs tracking-wide overflow-hidden max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">
+          <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 tracking-wider">
+            Select Status
+          </div>
+          {options.map((option) => {
+            const isSelected = normalizedStatus === option;
+            return (
+              <button
+                key={option}
+                type="button"
+                onClick={() => {
+                  onChange(option);
+                  setOpen(false);
+                }}
+                className={`w-full py-2 px-3 flex items-center justify-between text-xs transition-colors cursor-pointer text-left ${
+                  isSelected
+                    ? 'bg-blue-50 text-blue-700 font-bold'
+                    : 'text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${getDotColor(option)}`} />
+                  <span className="truncate">{option}</span>
+                </div>
+                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const EnrollmentApplications: React.FC = () => {
   const {
     enrollments,
@@ -127,6 +285,7 @@ export const EnrollmentApplications: React.FC = () => {
   const [payerType, setPayerType] = useState('Commercial');
   const [stateName, setStateName] = useState('FL');
   const [priority, setPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
+  const [modalStatus, setModalStatus] = useState<string>('Pending');
   const [referenceNumber, setReferenceNumber] = useState('');
   const [dateOfSubmission, setDateOfSubmission] = useState('Oct 31, 2026');
   const [followUpDate, setFollowUpDate] = useState('Nov 14, 2026');
@@ -153,6 +312,7 @@ export const EnrollmentApplications: React.FC = () => {
     
     setNotes('');
     setCustomPayer('');
+    setModalStatus('Pending');
     setIsAddModalOpen(true);
   };
 
@@ -183,7 +343,7 @@ export const EnrollmentApplications: React.FC = () => {
       type: payerType,
       payer: finalPayer,
       priority: priority,
-      status: 'PENDING',
+      status: modalStatus || 'Pending',
       dateOfSubmission: dateOfSubmission || 'Oct 31, 2026',
       referenceNumber: finalRef,
       followUpDate: followUpDate || 'Nov 14, 2026',
@@ -486,27 +646,14 @@ export const EnrollmentApplications: React.FC = () => {
                       />
                     </td>
 
-                    {/* 8. Status */}
+                    {/* 8. Status (Interactive Dropdown with 13 Healthcare Workflow Options) */}
                     <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <div className="inline-block relative">
-                        <select
-                          value={item.status}
-                          onChange={(e) => updateEnrollmentStatus(item.id, e.target.value as any)}
-                          className="sr-only"
-                          id={`status-select-${item.id}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const nextStatus = item.status === 'PENDING' ? 'ACTIVE' : item.status === 'ACTIVE' ? 'SUBMITTED' : 'PENDING';
-                            updateEnrollmentStatus(item.id, nextStatus as any);
-                          }}
-                          className="cursor-pointer group flex items-center justify-center gap-1"
-                          title="Click to toggle status (Pending -> Active -> Submitted)"
-                        >
-                          <StatusBadge status={item.status} />
-                        </button>
-                      </div>
+                      <EnrollmentStatusBadge
+                        status={item.status}
+                        onChange={(newStatus) => {
+                          updateEnrollmentStatus(item.id, newStatus);
+                        }}
+                      />
                     </td>
 
                     {/* 9. Date of Submission */}
@@ -782,20 +929,41 @@ export const EnrollmentApplications: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* State and Priority (2 columns) */}
+                    {/* State / Jurisdiction */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+                        State / Jurisdiction <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={stateName}
+                        onChange={(e) => setStateName(e.target.value)}
+                        placeholder="e.g. FL, NY, CA, TX, UK - National"
+                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+
+                    {/* Status and Priority (2 columns) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       <div>
                         <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          State / Jurisdiction <span className="text-rose-500">*</span>
+                          Initial Status <span className="text-rose-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          value={stateName}
-                          onChange={(e) => setStateName(e.target.value)}
-                          placeholder="e.g. FL, NY, CA, TX, UK - National"
-                          className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                          required
-                        />
+                        <div className="relative">
+                          <select
+                            value={modalStatus}
+                            onChange={(e) => setModalStatus(e.target.value)}
+                            className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none pr-8 font-semibold"
+                          >
+                            {enrollmentStatusOptions.map((opt) => (
+                              <option key={opt} value={opt}>
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                        </div>
                       </div>
 
                       <div>

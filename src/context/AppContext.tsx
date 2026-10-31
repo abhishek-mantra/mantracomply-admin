@@ -41,7 +41,7 @@ interface AppContextType {
   
   enrollments: EnrollmentRecord[];
   addEnrollment: (enrollment: Omit<EnrollmentRecord, 'id'>) => void;
-  updateEnrollmentStatus: (id: number, status: StatusType) => void;
+  updateEnrollmentStatus: (id: number, status: string) => void;
   assignEnrollmentSpecialist: (id: number, specialist: string) => void;
   updateEnrollmentDetails: (id: number, updates: Partial<EnrollmentRecord>) => void;
 
@@ -200,8 +200,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setEnrollments(prev => [newRecord, ...prev]);
   };
 
-  const updateEnrollmentStatus = (id: number, status: StatusType) => {
-    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, status: status as any } : e));
+  const updateEnrollmentStatus = (id: number, status: string) => {
+    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, status } : e));
   };
 
   const assignEnrollmentSpecialist = (id: number, specialist: string) => {

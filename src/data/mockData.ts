@@ -66,6 +66,38 @@ export interface DocumentRecord {
   status: 'PENDING' | 'VERIFIED' | 'UNVERIFIED' | 'RESUBMITTED';
 }
 
+export type EnrollmentStatus = 
+  | 'Pending'
+  | 'In Progress'
+  | 'Submitted'
+  | 'Request form Submitted'
+  | 'LOI Submitted'
+  | 'Network Status Verification'
+  | 'Need Information'
+  | 'Enrolled'
+  | 'Inactive'
+  | 'Network Close'
+  | 'On Hold'
+  | 'Rejected'
+  | 'Not Accepting'
+  | string;
+
+export const enrollmentStatusOptions: EnrollmentStatus[] = [
+  'Pending',
+  'In Progress',
+  'Submitted',
+  'Request form Submitted',
+  'LOI Submitted',
+  'Network Status Verification',
+  'Need Information',
+  'Enrolled',
+  'Inactive',
+  'Network Close',
+  'On Hold',
+  'Rejected',
+  'Not Accepting'
+];
+
 export interface EnrollmentRecord {
   id: number;
   providerName: string;
@@ -75,7 +107,7 @@ export interface EnrollmentRecord {
   type: string;
   payer: string;
   priority: 'High' | 'Medium' | 'Low' | 'Standard';
-  status: 'PENDING' | 'ACTIVE' | 'SUBMITTED';
+  status: EnrollmentStatus;
   dateOfSubmission: string;
   referenceNumber: string;
   followUpDate: string;
@@ -287,7 +319,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aetna",
     priority: "High",
-    status: "PENDING",
+    status: "Pending",
     dateOfSubmission: "Sep 28, 2026",
     referenceNumber: "REF-AET-99214",
     followUpDate: "Nov 14, 2026",
@@ -309,7 +341,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Vitality",
     priority: "High",
-    status: "ACTIVE",
+    status: "Enrolled",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-VIT-44012",
     followUpDate: "Oct 20, 2026",
@@ -331,7 +363,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "WPA",
     priority: "Standard",
-    status: "ACTIVE",
+    status: "In Progress",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-WPA-22108",
     followUpDate: "Oct 15, 2026",
@@ -353,7 +385,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aviva",
     priority: "Standard",
-    status: "ACTIVE",
+    status: "Submitted",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-AVV-88319",
     followUpDate: "Nov 01, 2026",
@@ -375,7 +407,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "AXA Health",
     priority: "High",
-    status: "ACTIVE",
+    status: "Request form Submitted",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-AXA-55920",
     followUpDate: "Oct 30, 2026",
@@ -397,7 +429,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Bupa",
     priority: "High",
-    status: "PENDING",
+    status: "LOI Submitted",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-BUP-11924",
     followUpDate: "Nov 10, 2026",
@@ -419,7 +451,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aviva",
     priority: "Standard",
-    status: "ACTIVE",
+    status: "Network Status Verification",
     dateOfSubmission: "Sep 8, 2026",
     referenceNumber: "REF-AVV-99120",
     followUpDate: "Nov 05, 2026",
@@ -441,7 +473,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aetna",
     priority: "Standard",
-    status: "ACTIVE",
+    status: "Need Information",
     dateOfSubmission: "Sep 1, 2026",
     referenceNumber: "REF-AET-77192",
     followUpDate: "Dec 01, 2026",
@@ -463,7 +495,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aetna",
     priority: "Standard",
-    status: "ACTIVE",
+    status: "On Hold",
     dateOfSubmission: "Sep 1, 2026",
     referenceNumber: "REF-AET-66301",
     followUpDate: "Dec 10, 2026",
@@ -485,7 +517,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aetna",
     priority: "Medium",
-    status: "SUBMITTED",
+    status: "Not Accepting",
     dateOfSubmission: "Aug 20, 2026",
     referenceNumber: "REF-AET-33290",
     followUpDate: "Nov 18, 2026",
