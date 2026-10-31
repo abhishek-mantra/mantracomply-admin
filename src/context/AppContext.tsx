@@ -47,6 +47,10 @@ interface AppContextType {
 
   availableSpecialists: string[];
   
+  // Sidebar state
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+
   // Quick capability helpers
   isSuperAdmin: boolean;
   isAdmin: boolean;
@@ -64,6 +68,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [providers, setProviders] = useState<ProviderApplication[]>(initialProviders);
   const [facilities, setFacilities] = useState<FacilityApplication[]>(initialFacilities);
   const [enrollments, setEnrollments] = useState<EnrollmentRecord[]>(initialEnrollments);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
   const switchPersona = (personaId: string) => {
     const found = personas.find(p => p.id === personaId);
@@ -243,6 +248,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         assignEnrollmentSpecialist,
         updateEnrollmentDetails,
         availableSpecialists,
+        sidebarCollapsed,
+        setSidebarCollapsed,
         isSuperAdmin,
         isAdmin,
         isSpecialist,

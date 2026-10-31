@@ -9,10 +9,11 @@ import { UsersManagement } from './pages/UsersManagement';
 import { PlansPricing } from './pages/PlansPricing';
 import { CreditsManagement } from './pages/CreditsManagement';
 import { SubscriptionsOrders } from './pages/SubscriptionsOrders';
+import { useApp } from './context/AppContext';
 
 const AppContent: React.FC = () => {
+  const { sidebarCollapsed, setSidebarCollapsed } = useApp();
   const [activeTab, setActiveTab] = useState<string>('credential-applications');
-  const [collapsed, setCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -86,8 +87,8 @@ const AppContent: React.FC = () => {
       <Sidebar
         activeTab={activeTab}
         setActiveTab={handleTabChange}
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
       />
 
       {/* Main Content Area */}

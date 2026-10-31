@@ -85,18 +85,39 @@ export type EnrollmentStatus =
 export const enrollmentStatusOptions: EnrollmentStatus[] = [
   'Pending',
   'In Progress',
-  'Submitted',
   'Request form Submitted',
   'LOI Submitted',
+  'Submitted',
   'Network Status Verification',
   'Need Information',
   'Enrolled',
+  'On Hold',
   'Inactive',
   'Network Close',
-  'On Hold',
-  'Rejected',
-  'Not Accepting'
+  'Not Accepting',
+  'Rejected'
 ];
+
+export interface ClientActivity {
+  id: string;
+  type: 'STAGE_UPDATED' | 'CALL_COMPLETED' | 'NOTE_ADDED';
+  title: string;
+  subtitle?: string;
+  badgeText?: string;
+  timestamp: string;
+}
+
+export interface ClientDocument {
+  id: string;
+  name: string;
+  type: string;
+  uploadDate: string;
+  expiryDate?: string;
+  status: 'VERIFIED' | 'PENDING' | 'RESUBMITTED';
+  documentNumber?: string;
+  uploadedBy?: string;
+  size?: string;
+}
 
 export interface EnrollmentRecord {
   id: number;
@@ -116,6 +137,25 @@ export interface EnrollmentRecord {
   recredentialingDate: string;
   providerInsuranceId: string;
   notes: string;
+
+  // Drawer client information & editable details
+  email?: string;
+  phone?: string;
+  timezone?: string;
+  category?: string;
+  payerNetwork?: string;
+  applicationType?: string;
+  medicalGroup?: string;
+  startDate?: string;
+  resubmittedDate?: string;
+  approvalDate?: string;
+  submissionTimeDays?: number;
+  timeToRevalidationDays?: number;
+  payerApprovalTimeDays?: number;
+  createdBy?: string;
+  lastModifiedBy?: string;
+  activities?: ClientActivity[];
+  documents?: ClientDocument[];
 
   // Backward-compatibility aliases
   date?: string;

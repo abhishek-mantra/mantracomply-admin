@@ -8,15 +8,44 @@ import {
   ChevronRight, 
   ChevronsLeft, 
   ChevronsRight,
-  Shield,
-  UserCheck,
-  Plus,
-  X,
+  Plus, 
+  X, 
   AlertCircle,
-  ShieldCheck
+  Settings,
+  GripVertical,
+  Check
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { availableSpecialists, enrollmentStatusOptions } from '../data/mockData';
+import { availableSpecialists, enrollmentStatusOptions, EnrollmentRecord } from '../data/mockData';
+import { PipelineStageBar } from '../components/PipelineStageBar';
+import { ClientDetailDrawer } from '../components/ClientDetailDrawer';
+
+export interface ColumnDef {
+  id: string;
+  label: string;
+  visible: boolean;
+  minWidth?: string;
+  isSticky?: boolean;
+}
+
+const DEFAULT_COLUMNS: ColumnDef[] = [
+  { id: 'providerName', label: 'Provider Name', visible: true, minWidth: '200px' },
+  { id: 'organization', label: 'Organization', visible: true, minWidth: '140px' },
+  { id: 'service', label: 'Service', visible: true, minWidth: '130px' },
+  { id: 'state', label: 'State', visible: true, minWidth: '120px' },
+  { id: 'type', label: 'Type', visible: true, minWidth: '120px' },
+  { id: 'payer', label: 'Payer', visible: true, minWidth: '140px' },
+  { id: 'priority', label: 'Priority', visible: true, minWidth: '110px' },
+  { id: 'stage', label: 'Stage', visible: true, minWidth: '190px' },
+  { id: 'dateOfSubmission', label: 'Date of Submission', visible: true, minWidth: '150px' },
+  { id: 'referenceNumber', label: 'Reference Number', visible: true, minWidth: '150px' },
+  { id: 'followUpDate', label: 'Follow Up Date', visible: true, minWidth: '130px' },
+  { id: 'responsibleUser', label: 'Responsible User', visible: true, minWidth: '170px' },
+  { id: 'effectiveDate', label: 'Effective Date', visible: true, minWidth: '130px' },
+  { id: 'recredentialingDate', label: 'Recredentialing Date', visible: true, minWidth: '150px' },
+  { id: 'providerInsuranceId', label: 'Provider Insurance ID', visible: true, minWidth: '170px' },
+  { id: 'notes', label: 'Notes', visible: true, minWidth: '320px' }
+];
 
 // Interactive Priority Dropdown Badge Component
 const PriorityBadge: React.FC<{
@@ -95,165 +124,6 @@ const PriorityBadge: React.FC<{
   );
 };
 
-// Interactive Enrollment Status Dropdown Badge Component
-const EnrollmentStatusBadge: React.FC<{
-  status: string;
-  onChange: (newStatus: string) => void;
-}> = ({ status, onChange }) => {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const normalizedStatus = useMemo(() => {
-    if (status === 'ACTIVE') return 'Enrolled';
-    if (status === 'PENDING') return 'Pending';
-    if (status === 'SUBMITTED') return 'Submitted';
-    return status || 'Pending';
-  }, [status]);
-
-  const getStyle = (s: string) => {
-    switch (s) {
-      case 'Enrolled':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100';
-      case 'Pending':
-        return 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100';
-      case 'In Progress':
-        return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
-      case 'Submitted':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100';
-      case 'Request form Submitted':
-        return 'bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100';
-      case 'LOI Submitted':
-        return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
-      case 'Network Status Verification':
-        return 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100';
-      case 'Need Information':
-        return 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100';
-      case 'Inactive':
-        return 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
-      case 'Network Close':
-        return 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200';
-      case 'On Hold':
-        return 'bg-yellow-50 text-yellow-800 border-yellow-300 hover:bg-yellow-100';
-      case 'Rejected':
-        return 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100';
-      case 'Not Accepting':
-        return 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100';
-      default:
-        return 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
-    }
-  };
-
-  const getDotColor = (s: string) => {
-    switch (s) {
-      case 'Enrolled':
-        return 'bg-emerald-500';
-      case 'Pending':
-        return 'bg-amber-500';
-      case 'In Progress':
-        return 'bg-blue-500';
-      case 'Submitted':
-        return 'bg-indigo-500';
-      case 'Request form Submitted':
-        return 'bg-sky-500';
-      case 'LOI Submitted':
-        return 'bg-purple-500';
-      case 'Network Status Verification':
-        return 'bg-teal-500';
-      case 'Need Information':
-        return 'bg-orange-500';
-      case 'Inactive':
-        return 'bg-slate-400';
-      case 'Network Close':
-        return 'bg-zinc-500';
-      case 'On Hold':
-        return 'bg-yellow-500';
-      case 'Rejected':
-        return 'bg-rose-500';
-      case 'Not Accepting':
-        return 'bg-red-600';
-      default:
-        return 'bg-slate-400';
-    }
-  };
-
-  const options = [
-    'Pending',
-    'In Progress',
-    'Submitted',
-    'Request form Submitted',
-    'LOI Submitted',
-    'Network Status Verification',
-    'Need Information',
-    'Enrolled',
-    'Inactive',
-    'Network Close',
-    'On Hold',
-    'Rejected',
-    'Not Accepting'
-  ];
-
-  return (
-    <div className="relative inline-block text-left" ref={ref}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className={`inline-flex items-center justify-between gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide border transition-all cursor-pointer min-w-[120px] shadow-2xs whitespace-nowrap ${getStyle(
-          normalizedStatus
-        )}`}
-        title="Click to change status"
-      >
-        <span className="flex items-center gap-1.5 truncate max-w-[150px]">
-          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getDotColor(normalizedStatus)}`} />
-          <span className="truncate">{normalizedStatus}</span>
-        </span>
-        <ChevronDown size={11} className="opacity-70 shrink-0 ml-1" />
-      </button>
-
-      {open && (
-        <div className="absolute left-1/2 -translate-x-1/2 mt-1 w-64 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 font-semibold text-xs tracking-wide overflow-hidden max-h-72 overflow-y-auto animate-in fade-in zoom-in-95 duration-100">
-          <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 tracking-wider">
-            Select Status
-          </div>
-          {options.map((option) => {
-            const isSelected = normalizedStatus === option;
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() => {
-                  onChange(option);
-                  setOpen(false);
-                }}
-                className={`w-full py-2 px-3 flex items-center justify-between text-xs transition-colors cursor-pointer text-left ${
-                  isSelected
-                    ? 'bg-blue-50 text-blue-700 font-bold'
-                    : 'text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <span className={`w-2 h-2 rounded-full shrink-0 ${getDotColor(option)}`} />
-                  <span className="truncate">{option}</span>
-                </div>
-                {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
-
 export const EnrollmentApplications: React.FC = () => {
   const {
     enrollments,
@@ -271,6 +141,55 @@ export const EnrollmentApplications: React.FC = () => {
   const [activeToggle, setActiveToggle] = useState<'providers' | 'facilities'>('providers');
   const [searchTerm, setSearchTerm] = useState('');
   const [specialistFilter, setSpecialistFilter] = useState<string>('ALL');
+
+  // Column Settings State (Image 4 - Reorder & Toggle columns)
+  const [columns, setColumns] = useState<ColumnDef[]>(() => {
+    try {
+      const saved = localStorage.getItem('mantra_enrollment_columns');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_COLUMNS;
+  });
+  const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+  const [draggedColumnIdx, setDraggedColumnIdx] = useState<number | null>(null);
+
+  const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
+
+  const toggleColumnVisibility = (id: string) => {
+    setColumns(prev => {
+      const updated = prev.map(c => c.id === id ? { ...c, visible: !c.visible } : c);
+      try { localStorage.setItem('mantra_enrollment_columns', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  };
+
+  const moveColumn = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= columns.length) return;
+    setColumns(prev => {
+      const list = [...prev];
+      const [moved] = list.splice(fromIdx, 1);
+      list.splice(toIdx, 0, moved);
+      try { localStorage.setItem('mantra_enrollment_columns', JSON.stringify(list)); } catch {}
+      return list;
+    });
+  };
+
+  const resetColumns = () => {
+    setColumns(DEFAULT_COLUMNS);
+    try { localStorage.removeItem('mantra_enrollment_columns'); } catch {}
+  };
+
+  // Client Detail Side Drawer State
+  const [selectedClientRecord, setSelectedClientRecord] = useState<EnrollmentRecord | null>(null);
+
+  useEffect(() => {
+    if (selectedClientRecord) {
+      const live = enrollments.find(e => e.id === selectedClientRecord.id);
+      if (live) {
+        setSelectedClientRecord(live);
+      }
+    }
+  }, [enrollments]);
 
   // Filter ONLY providers who have been credentialized (Status === APPROVED in Credential Applications tab)
   const approvedProviders = useMemo(() => {
@@ -356,10 +275,6 @@ export const EnrollmentApplications: React.FC = () => {
 
     setIsAddModalOpen(false);
   };
-
-  const selectedProviderObject = useMemo(() => {
-    return approvedProviders.find(p => p.id.toString() === selectedProviderId);
-  }, [approvedProviders, selectedProviderId]);
 
   // Filtered Enrollments with Data Isolation logic & comprehensive multi-field search
   const filteredEnrollments = useMemo(() => {
@@ -447,33 +362,6 @@ export const EnrollmentApplications: React.FC = () => {
         </div>
       </div>
 
-      {/* Role-based Data Scope Notice Banner */}
-      {isSpecialist ? (
-        <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-950">
-          <div className="flex items-center gap-2 font-medium">
-            <UserCheck size={16} className="text-emerald-600 shrink-0" />
-            <span>
-              <strong>Specialist View Mode:</strong> You are logged in as <strong>{currentPersona.name}</strong>. Only insurance enrollments assigned specifically to you are visible. Other specialists' workloads are restricted.
-            </span>
-          </div>
-          <span className="font-bold text-[10px] tracking-wide uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
-            Assigned Only Scope
-          </span>
-        </div>
-      ) : (
-        <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl flex items-center justify-between text-xs text-blue-950">
-          <div className="flex items-center gap-2 font-medium">
-            <Shield size={16} className="text-blue-600 shrink-0" />
-            <span>
-              <strong>Admin Access Active:</strong> You can see all insurance enrollment requests made by all credentialing specialists across the entire organization.
-            </span>
-          </div>
-          <span className="font-bold text-[10px] tracking-wide uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-300">
-            Global View Scope
-          </span>
-        </div>
-      )}
-
       {/* Search & Filter Bar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
@@ -517,82 +405,45 @@ export const EnrollmentApplications: React.FC = () => {
         </div>
       </div>
 
-      {/* Scrollable Rows Table with all 16 Columns */}
+      {/* Scrollable Rows Table with all Configurable Columns */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[2100px]">
             <thead>
               <tr className="bg-[#002B49] text-white text-[11px] font-bold uppercase tracking-wider">
-                {/* 1. Provider Name (Sticky Left Column) */}
-                <th className="py-3.5 px-4 sticky left-0 bg-[#002B49] z-20 shadow-[2px_0_4px_rgba(0,0,0,0.18)] min-w-[200px] border-r border-[#1a4a6e]">
-                  Provider Name
+                {/* Checkbox Column */}
+                <th className="py-3.5 px-3 w-10 text-center sticky left-0 bg-[#002B49] z-20 border-r border-[#1a4a6e]">
+                  <input type="checkbox" className="rounded cursor-pointer" />
                 </th>
-                {/* 2. Organization */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[140px] border-r border-[#1a4a6e]">
-                  Organization
+                {/* Column Settings Gear Icon (Image 4) */}
+                <th className="py-3.5 px-2 w-10 text-center sticky left-10 bg-[#002B49] z-20 border-r border-[#1a4a6e]">
+                  <button
+                    type="button"
+                    onClick={() => setIsColumnSettingsOpen(true)}
+                    className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer mx-auto text-slate-200 hover:text-white"
+                    title="Column Settings (Reorder & Toggle Columns)"
+                  >
+                    <Settings size={15} />
+                  </button>
                 </th>
-                {/* 3. Service */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[130px] border-r border-[#1a4a6e]">
-                  Service
-                </th>
-                {/* 4. State */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[130px] border-r border-[#1a4a6e]">
-                  State
-                </th>
-                {/* 5. Type */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[120px] border-r border-[#1a4a6e]">
-                  Type
-                </th>
-                {/* 6. Payer */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[140px] border-r border-[#1a4a6e]">
-                  Payer
-                </th>
-                {/* 7. Priority */}
-                <th className="py-3.5 px-4 whitespace-nowrap text-center min-w-[100px] border-r border-[#1a4a6e]">
-                  Priority
-                </th>
-                {/* 8. Status */}
-                <th className="py-3.5 px-4 whitespace-nowrap text-center min-w-[120px] border-r border-[#1a4a6e]">
-                  Status
-                </th>
-                {/* 9. Date of Submission */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[150px] border-r border-[#1a4a6e]">
-                  Date of Submission
-                </th>
-                {/* 10. Reference Number */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[150px] border-r border-[#1a4a6e]">
-                  Reference Number
-                </th>
-                {/* 11. Follow Up Date */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[130px] border-r border-[#1a4a6e]">
-                  Follow Up Date
-                </th>
-                {/* 12. Responsible User */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[170px] border-r border-[#1a4a6e]">
-                  Responsible User
-                </th>
-                {/* 13. Effective Date */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[130px] border-r border-[#1a4a6e]">
-                  Effective Date
-                </th>
-                {/* 14. Recredentialing Date */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[150px] border-r border-[#1a4a6e]">
-                  Recredentialing Date
-                </th>
-                {/* 15. Provider Insurance ID */}
-                <th className="py-3.5 px-4 whitespace-nowrap min-w-[170px] border-r border-[#1a4a6e]">
-                  Provider Insurance ID
-                </th>
-                {/* 16. Notes */}
-                <th className="py-3.5 px-4 min-w-[320px]">
-                  Notes
-                </th>
+                {/* Dynamically Ordered Visible Columns */}
+                {visibleColumns.map((col, idx) => (
+                  <th
+                    key={col.id}
+                    className={`py-3.5 px-4 whitespace-nowrap border-r border-[#1a4a6e] ${
+                      idx === 0 ? 'sticky left-20 bg-[#002B49] z-20 shadow-[2px_0_4px_rgba(0,0,0,0.18)]' : ''
+                    }`}
+                    style={{ minWidth: col.minWidth }}
+                  >
+                    {col.label}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
               {filteredEnrollments.length === 0 ? (
                 <tr>
-                  <td colSpan={16} className="text-center py-16 text-slate-400 text-sm">
+                  <td colSpan={visibleColumns.length + 2} className="text-center py-16 text-slate-400 text-sm">
                     {isSpecialist 
                       ? `No enrollment requests currently assigned to ${currentPersona.name}.`
                       : `No enrollment requests found matching your filters.`}
@@ -601,142 +452,187 @@ export const EnrollmentApplications: React.FC = () => {
               ) : (
                 filteredEnrollments.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                    {/* 1. Provider Name (Sticky Left Column) */}
-                    <td className="py-3 px-4 sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.06)] border-r border-slate-100">
-                      <div className="font-semibold text-slate-900 whitespace-nowrap">
-                        {item.providerName}
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        ID: #{item.id}
-                      </div>
+                    {/* Row Checkbox & Drag / Menu Icon */}
+                    <td className="py-3 px-3 text-center sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-10 border-r border-slate-100">
+                      <input type="checkbox" className="rounded text-blue-600 cursor-pointer" />
+                    </td>
+                    <td className="py-3 px-2 text-center text-slate-400 sticky left-10 bg-white group-hover:bg-slate-50 transition-colors z-10 border-r border-slate-100">
+                      ≡
                     </td>
 
-                    {/* 2. Organization */}
-                    <td className="py-3 px-4 text-slate-700 font-medium whitespace-nowrap">
-                      {item.organization}
-                    </td>
+                    {/* Dynamically Render Visible Columns in Customized Order */}
+                    {visibleColumns.map((col, idx) => {
+                      const isFirst = idx === 0;
+                      const stickyClass = isFirst 
+                        ? 'sticky left-20 bg-white group-hover:bg-slate-50 transition-colors z-10 shadow-[2px_0_4px_rgba(0,0,0,0.06)] border-r border-slate-100'
+                        : 'border-r border-slate-100';
 
-                    {/* 3. Service */}
-                    <td className="py-3 px-4 text-blue-700 font-semibold uppercase whitespace-nowrap">
-                      {item.service}
-                    </td>
-
-                    {/* 4. State */}
-                    <td className="py-3 px-4 text-slate-700 font-medium whitespace-nowrap">
-                      {item.state || '—'}
-                    </td>
-
-                    {/* 5. Type */}
-                    <td className="py-3 px-4 text-slate-700 whitespace-nowrap">
-                      {item.type || 'Commercial'}
-                    </td>
-
-                    {/* 6. Payer */}
-                    <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
-                      {item.payer || item.insurance}
-                    </td>
-
-                    {/* 7. Priority (Interactive Dropdown Badge) */}
-                    <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <PriorityBadge 
-                        priority={item.priority || 'Low'} 
-                        onChange={(newPriority) => {
-                          updateEnrollmentDetails(item.id, { priority: newPriority });
-                        }}
-                      />
-                    </td>
-
-                    {/* 8. Status (Interactive Dropdown with 13 Healthcare Workflow Options) */}
-                    <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <EnrollmentStatusBadge
-                        status={item.status}
-                        onChange={(newStatus) => {
-                          updateEnrollmentStatus(item.id, newStatus);
-                        }}
-                      />
-                    </td>
-
-                    {/* 9. Date of Submission */}
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap font-medium">
-                      {item.dateOfSubmission || item.date || '—'}
-                    </td>
-
-                    {/* 10. Reference Number */}
-                    <td className="py-3 px-4 text-slate-800 font-mono text-[11px] whitespace-nowrap">
-                      {item.referenceNumber ? (
-                        <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
-                          {item.referenceNumber}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">—</span>
-                      )}
-                    </td>
-
-                    {/* 11. Follow Up Date */}
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap font-medium">
-                      {item.followUpDate || '—'}
-                    </td>
-
-                    {/* 12. Responsible User (Assigned Specialist Dropdown) */}
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      {isAdmin ? (
-                        <div className="relative inline-block">
-                          <select
-                            value={item.responsibleUser || item.assignedSpecialist || availableSpecialists[0]}
-                            onChange={(e) => assignEnrollmentSpecialist(item.id, e.target.value)}
-                            className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          >
-                            {availableSpecialists.map((specialist) => (
-                              <option key={specialist} value={specialist}>
-                                {specialist}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
-                        </div>
-                      ) : (
-                        <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
-                          {item.responsibleUser || item.assignedSpecialist}
-                        </span>
-                      )}
-                    </td>
-
-                    {/* 13. Effective Date */}
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      {item.effectiveDate && item.effectiveDate !== 'Pending' ? (
-                        <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                          {item.effectiveDate}
-                        </span>
-                      ) : (
-                        <span className="text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px]">
-                          Pending
-                        </span>
-                      )}
-                    </td>
-
-                    {/* 14. Recredentialing Date */}
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap font-medium">
-                      {item.recredentialingDate || '—'}
-                    </td>
-
-                    {/* 15. Provider Insurance ID */}
-                    <td className="py-3 px-4 whitespace-nowrap font-mono text-[11px]">
-                      {item.providerInsuranceId ? (
-                        <span className="bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200">
-                          {item.providerInsuranceId}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">—</span>
-                      )}
-                    </td>
-
-                    {/* 16. Notes */}
-                    <td 
-                      className="py-3 px-4 text-slate-600 min-w-[320px] max-w-[420px] truncate" 
-                      title={item.notes}
-                    >
-                      {item.notes || '—'}
-                    </td>
+                      switch (col.id) {
+                        case 'providerName':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 ${stickyClass}`}>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedClientRecord(item)}
+                                className="text-left group/btn cursor-pointer focus:outline-none"
+                                title="Click to view client details, processes & documents"
+                              >
+                                <div className="font-semibold text-blue-600 group-hover/btn:text-blue-800 group-hover/btn:underline whitespace-nowrap">
+                                  {item.providerName}
+                                </div>
+                                <div className="text-[10px] text-slate-400 mt-0.5 font-normal">
+                                  ID: #{item.id}
+                                </div>
+                              </button>
+                            </td>
+                          );
+                        case 'organization':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${stickyClass}`}>
+                              {item.organization}
+                            </td>
+                          );
+                        case 'service':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-blue-700 font-semibold uppercase whitespace-nowrap ${stickyClass}`}>
+                              {item.service}
+                            </td>
+                          );
+                        case 'state':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${stickyClass}`}>
+                              {item.state || '—'}
+                            </td>
+                          );
+                        case 'type':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${stickyClass}`}>
+                              {item.type || 'Commercial'}
+                            </td>
+                          );
+                        case 'payer':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 font-bold text-slate-900 whitespace-nowrap ${stickyClass}`}>
+                              {item.payer || item.insurance}
+                            </td>
+                          );
+                        case 'priority':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-center whitespace-nowrap ${stickyClass}`}>
+                              <PriorityBadge 
+                                priority={item.priority || 'Low'} 
+                                onChange={(newPriority) => {
+                                  updateEnrollmentDetails(item.id, { priority: newPriority });
+                                }}
+                              />
+                            </td>
+                          );
+                        case 'stage':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${stickyClass}`}>
+                              <PipelineStageBar
+                                status={item.status}
+                                onChange={(newStatus) => {
+                                  updateEnrollmentStatus(item.id, newStatus);
+                                }}
+                              />
+                            </td>
+                          );
+                        case 'dateOfSubmission':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-600 whitespace-nowrap font-medium ${stickyClass}`}>
+                              {item.dateOfSubmission || item.date || '—'}
+                            </td>
+                          );
+                        case 'referenceNumber':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-800 font-mono text-[11px] whitespace-nowrap ${stickyClass}`}>
+                              {item.referenceNumber ? (
+                                <span className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
+                                  {item.referenceNumber}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">—</span>
+                              )}
+                            </td>
+                          );
+                        case 'followUpDate':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-600 whitespace-nowrap font-medium ${stickyClass}`}>
+                              {item.followUpDate || '—'}
+                            </td>
+                          );
+                        case 'responsibleUser':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${stickyClass}`}>
+                              {isAdmin ? (
+                                <div className="relative inline-block">
+                                  <select
+                                    value={item.responsibleUser || item.assignedSpecialist || availableSpecialists[0]}
+                                    onChange={(e) => assignEnrollmentSpecialist(item.id, e.target.value)}
+                                    className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  >
+                                    {availableSpecialists.map((specialist) => (
+                                      <option key={specialist} value={specialist}>
+                                        {specialist}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                </div>
+                              ) : (
+                                <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200">
+                                  {item.responsibleUser || item.assignedSpecialist}
+                                </span>
+                              )}
+                            </td>
+                          );
+                        case 'effectiveDate':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${stickyClass}`}>
+                              {item.effectiveDate && item.effectiveDate !== 'Pending' ? (
+                                <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                                  {item.effectiveDate}
+                                </span>
+                              ) : (
+                                <span className="text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px]">
+                                  Pending
+                                </span>
+                              )}
+                            </td>
+                          );
+                        case 'recredentialingDate':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 text-slate-600 whitespace-nowrap font-medium ${stickyClass}`}>
+                              {item.recredentialingDate || '—'}
+                            </td>
+                          );
+                        case 'providerInsuranceId':
+                          return (
+                            <td key={col.id} className={`py-3 px-4 whitespace-nowrap font-mono text-[11px] ${stickyClass}`}>
+                              {item.providerInsuranceId ? (
+                                <span className="bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded border border-blue-200">
+                                  {item.providerInsuranceId}
+                                </span>
+                              ) : (
+                                <span className="text-slate-400">—</span>
+                              )}
+                            </td>
+                          );
+                        case 'notes':
+                          return (
+                            <td 
+                              key={col.id}
+                              className={`py-3 px-4 text-slate-600 min-w-[320px] max-w-[420px] truncate ${stickyClass}`}
+                              title={item.notes}
+                            >
+                              {item.notes || '—'}
+                            </td>
+                          );
+                        default:
+                          return null;
+                      }
+                    })}
                   </tr>
                 ))
               )}
@@ -851,21 +747,6 @@ export const EnrollmentApplications: React.FC = () => {
                         Only providers with status APPROVED in the Credential Applications tab appear here.
                       </p>
                     </div>
-
-                    {/* Selected Provider Info Pill */}
-                    {selectedProviderObject && (
-                      <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-950">
-                        <div className="flex items-center gap-2">
-                          <ShieldCheck className="text-emerald-600 shrink-0" size={16} />
-                          <span>
-                            <strong>{selectedProviderObject.name}</strong> • Org: <strong>{selectedProviderObject.organization}</strong> • Service: <strong>{selectedProviderObject.service}</strong>
-                          </span>
-                        </div>
-                        <span className="font-bold text-[10px] tracking-wide uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
-                          Credentialed
-                        </span>
-                      </div>
-                    )}
 
                     {/* Payer and Plan Type (2 columns) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
@@ -1088,6 +969,131 @@ export const EnrollmentApplications: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Column Settings Modal Dialog (Matching Image 4) */}
+      {isColumnSettingsOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div 
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsColumnSettingsOpen(false)}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all z-10 border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+              <div className="mb-4">
+                <h3 className="text-base font-bold text-slate-900">Column Settings</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Drag to reorder columns or toggle their visibility.
+                </p>
+              </div>
+
+              {/* Scrollable list of columns */}
+              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                {columns.map((col, idx) => (
+                  <div
+                    key={col.id}
+                    draggable
+                    onDragStart={() => setDraggedColumnIdx(idx)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => {
+                      if (draggedColumnIdx !== null && draggedColumnIdx !== idx) {
+                        moveColumn(draggedColumnIdx, idx);
+                      }
+                      setDraggedColumnIdx(null);
+                    }}
+                    className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                      draggedColumnIdx === idx 
+                        ? 'border-blue-400 bg-blue-50/50 shadow-md scale-[1.01]' 
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* 6-dot drag handle */}
+                      <div className="cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600">
+                        <GripVertical size={16} />
+                      </div>
+
+                      {/* Checkbox matching Image 4 */}
+                      <button
+                        type="button"
+                        onClick={() => toggleColumnVisibility(col.id)}
+                        className={`w-4 h-4 rounded flex items-center justify-center transition-colors cursor-pointer ${
+                          col.visible 
+                            ? 'bg-blue-600 text-white' 
+                            : 'border border-slate-300 bg-white'
+                        }`}
+                      >
+                        {col.visible && <Check size={12} strokeWidth={3} />}
+                      </button>
+
+                      {/* Column Title */}
+                      <span className={`text-xs font-bold uppercase tracking-wider ${col.visible ? 'text-slate-800' : 'text-slate-400'}`}>
+                        {col.label}
+                      </span>
+                    </div>
+
+                    {/* Move Up & Down Arrow Buttons */}
+                    <div className="flex items-center gap-0.5">
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => moveColumn(idx, idx - 1)}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer"
+                        title="Move Up"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        disabled={idx === columns.length - 1}
+                        onClick={() => moveColumn(idx, idx + 1)}
+                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 cursor-pointer"
+                        title="Move Down"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={resetColumns}
+                  className="text-xs text-slate-500 hover:text-blue-600 font-semibold cursor-pointer"
+                >
+                  Reset Default
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsColumnSettingsOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-[#1c2d42] hover:bg-[#002B49] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Client Detail Side Drawer (70% screen width) */}
+      {selectedClientRecord && (
+        <ClientDetailDrawer
+          client={selectedClientRecord}
+          onClose={() => setSelectedClientRecord(null)}
+          onUpdate={(updated) => {
+            updateEnrollmentDetails(updated.id, updated);
+            setSelectedClientRecord(updated);
+          }}
+          onOpenNewEnrollment={() => {
+            openAddModal();
+          }}
+        />
       )}
     </div>
   );
