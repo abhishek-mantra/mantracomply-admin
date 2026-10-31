@@ -959,7 +959,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                 >
                   <Plus size={14} />
-                  <span>+ Assign Process (New Enrollment)</span>
+                  <span>New Enrollment</span>
                 </button>
               </div>
 
@@ -1069,14 +1069,14 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                     className="hidden"
                   />
 
-                  {/* Dark "+ Upload / Generate" button matching Image 1 */}
+                  {/* Dark "Upload" button matching Image 1 */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-2 px-4 py-2 bg-[#001f35] hover:bg-[#002b49] text-white rounded-lg text-xs font-semibold shadow-xs transition-colors cursor-pointer"
                   >
                     <Plus size={14} />
-                    <span>+ Upload / Generate</span>
+                    <span>Upload</span>
                   </button>
                 </div>
               </div>

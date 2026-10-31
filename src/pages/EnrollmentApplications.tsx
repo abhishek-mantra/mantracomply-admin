@@ -16,7 +16,7 @@ import {
   Check
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { availableSpecialists, enrollmentStatusOptions, EnrollmentRecord } from '../data/mockData';
+import { availableSpecialists, EnrollmentRecord } from '../data/mockData';
 import { PipelineStageBar } from '../components/PipelineStageBar';
 import { ClientDetailDrawer } from '../components/ClientDetailDrawer';
 
@@ -203,8 +203,8 @@ export const EnrollmentApplications: React.FC = () => {
   const [customPayer, setCustomPayer] = useState('');
   const [payerType, setPayerType] = useState('Commercial');
   const [stateName, setStateName] = useState('FL');
-  const [priority, setPriority] = useState<'High' | 'Medium' | 'Low'>('Medium');
-  const [modalStatus, setModalStatus] = useState<string>('Pending');
+  const priority: 'High' | 'Medium' | 'Low' = 'Medium';
+  const modalStatus = 'Pending';
   const [referenceNumber, setReferenceNumber] = useState('');
   const [dateOfSubmission, setDateOfSubmission] = useState('Oct 31, 2026');
   const [followUpDate, setFollowUpDate] = useState('Nov 14, 2026');
@@ -231,7 +231,6 @@ export const EnrollmentApplications: React.FC = () => {
     
     setNotes('');
     setCustomPayer('');
-    setModalStatus('Pending');
     setIsAddModalOpen(true);
   };
 
@@ -823,76 +822,6 @@ export const EnrollmentApplications: React.FC = () => {
                         className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                         required
                       />
-                    </div>
-
-                    {/* Status and Priority (2 columns) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Initial Status <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={modalStatus}
-                            onChange={(e) => setModalStatus(e.target.value)}
-                            className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none pr-8 font-semibold"
-                          >
-                            {enrollmentStatusOptions.map((opt) => (
-                              <option key={opt} value={opt}>
-                                {opt}
-                              </option>
-                            ))}
-                          </select>
-                          <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Priority <span className="text-rose-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <select
-                            value={priority}
-                            onChange={(e) => setPriority(e.target.value as 'High' | 'Medium' | 'Low')}
-                            className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none pr-8 font-semibold"
-                          >
-                            <option value="High">High Priority</option>
-                            <option value="Medium">Medium Priority</option>
-                            <option value="Low">Low Priority</option>
-                          </select>
-                          <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Reference Number and Follow Up Date (2 columns) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Reference Number
-                        </label>
-                        <input
-                          type="text"
-                          value={referenceNumber}
-                          onChange={(e) => setReferenceNumber(e.target.value)}
-                          placeholder="e.g. REF-84920"
-                          className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono text-slate-700"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                          Follow Up Date
-                        </label>
-                        <input
-                          type="text"
-                          value={followUpDate}
-                          onChange={(e) => setFollowUpDate(e.target.value)}
-                          placeholder="e.g. Nov 14, 2026"
-                          className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                        />
-                      </div>
                     </div>
 
                     {/* Responsible Specialist and Provider Insurance ID (2 columns) */}
