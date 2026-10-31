@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, User, Shield, LogOut, Check } from 'lucide-react';
+import { ChevronDown, User, Shield, LogOut, Check, ArrowLeftRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Header: React.FC = () => {
@@ -128,33 +128,59 @@ export const Header: React.FC = () => {
         </div>
 
         {profileMenuOpen && (
-          <div className="absolute right-0 top-14 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 text-sm animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute right-0 top-14 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-1.5 z-50 text-sm animate-in fade-in zoom-in-95 duration-150">
             <div className="px-4 py-2.5 border-b border-slate-100">
-              <p className="font-semibold text-slate-800 text-xs">{currentPersona.name}</p>
-              <p className="text-[11px] text-slate-400">{currentPersona.email}</p>
-              <span className={`inline-block mt-1.5 px-2 py-0.5 rounded text-[10px] font-bold border ${getRoleBadgeStyle(currentPersona.role)}`}>
-                {currentPersona.role}
-              </span>
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                SIGNED IN AS
+              </div>
+              <p className="font-bold text-slate-900 text-xs truncate" title={currentPersona.email}>
+                {currentPersona.email}
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs font-semibold text-slate-700">{currentPersona.name}</span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getRoleBadgeStyle(currentPersona.role)}`}>
+                  {currentPersona.role}
+                </span>
+              </div>
             </div>
-            <button 
-              className="w-full px-4 py-2 text-left text-xs font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-              onClick={() => { setProfileMenuOpen(false); alert("User Profile Settings"); }}
-            >
-              <User size={14} /> Profile Settings
-            </button>
-            <button 
-              className="w-full px-4 py-2 text-left text-xs font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-              onClick={() => { setProfileMenuOpen(false); alert("Access Rights Overview"); }}
-            >
-              <Shield size={14} /> Permissions Matrix
-            </button>
+
+            <div className="p-1 space-y-0.5">
+              <button 
+                className="w-full px-3 py-2 text-left text-xs font-medium text-blue-600 hover:bg-blue-50/70 rounded-xl flex items-center gap-2.5 cursor-pointer transition-colors"
+                onClick={() => {
+                  setProfileMenuOpen(false);
+                  window.location.href = '/admin/overview';
+                }}
+              >
+                <ArrowLeftRight size={14} className="text-blue-600" />
+                <span>Switch to Client / Org Admin View</span>
+              </button>
+
+              <button 
+                className="w-full px-3 py-2 text-left text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl flex items-center gap-2.5 cursor-pointer transition-colors"
+                onClick={() => { setProfileMenuOpen(false); }}
+              >
+                <User size={14} /> Profile Settings
+              </button>
+
+              <button 
+                className="w-full px-3 py-2 text-left text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl flex items-center gap-2.5 cursor-pointer transition-colors"
+                onClick={() => { setProfileMenuOpen(false); }}
+              >
+                <Shield size={14} /> Permissions Matrix
+              </button>
+            </div>
+
             <div className="border-t border-slate-100 my-1"></div>
-            <button 
-              className="w-full px-4 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer"
-              onClick={() => { setProfileMenuOpen(false); alert("Sign out"); }}
-            >
-              <LogOut size={14} /> Sign Out
-            </button>
+
+            <div className="p-1">
+              <button 
+                className="w-full px-3 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 rounded-xl flex items-center gap-2.5 cursor-pointer transition-colors"
+                onClick={() => { setProfileMenuOpen(false); }}
+              >
+                <LogOut size={14} /> Sign Out
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -28,6 +28,7 @@ interface AppContextType {
   deleteRole: (roleId: string) => void;
   
   users: UserRecord[];
+  addUser: (userData: { name: string; email: string; role: RoleType; phone?: string; organization?: string }) => void;
   updateUserRole: (userId: number, newRole: RoleType) => void;
   
   providers: ProviderApplication[];
@@ -39,8 +40,10 @@ interface AppContextType {
   assignFacilitySpecialist: (id: string, specialist: string) => void;
   
   enrollments: EnrollmentRecord[];
+  addEnrollment: (enrollment: Omit<EnrollmentRecord, 'id'>) => void;
   updateEnrollmentStatus: (id: number, status: StatusType) => void;
   assignEnrollmentSpecialist: (id: number, specialist: string) => void;
+  updateEnrollmentDetails: (id: number, updates: Partial<EnrollmentRecord>) => void;
 
   availableSpecialists: string[];
   
@@ -95,6 +98,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setRoles(prev => prev.filter(r => r.id !== roleId));
   };
 
+  const addUser = (userData: { name: string; email: string; role: RoleType; phone?: string; organization?: string }) => {
+    const newUser: UserRecord = {
+      id: Date.now(),
+      name: userData.name,
+      email: userData.email,
+      phone: userData.phone || '+1 (555) 000-0000',
+      organization: userData.organization || 'Mantra Care',
+      country: 'United States',
+      countryFlag: '🇺🇸',
+      service: 'Credentialing',
+      signupDate: 'Oct 30, 2026',
+      role: userData.role,
+      status: 'Active',
+      credits: { used: 0, total: 100 }
+    };
+    setUsers(prev => [newUser, ...prev]);
+    setRoles(prev => prev.map(r => r.name === userData.role ? { ...r, userCount: r.userCount + 1 } : r));
+  };
+
   const updateUserRole = (userId: number, newRole: RoleType) => {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
     
@@ -134,11 +156,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
           const newEnrollment: EnrollmentRecord = {
             id: Date.now() % 10000,
             providerName: targetProvider.name,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             organization: targetProvider.organization,
             service: targetProvider.service,
-            insurance: "Aetna (Primary)",
+            state: "New York (NY)",
+            type: "Commercial",
+            payer: "Aetna (Primary)",
+            priority: "Standard",
             status: "PENDING",
+            dateOfSubmission: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            referenceNumber: `REF-${Date.now() % 10000}`,
+            followUpDate: "In 14 days",
+            responsibleUser: specialist,
+            effectiveDate: "Pending",
+            recredentialingDate: "—",
+            providerInsuranceId: `AET-NY-${Date.now() % 10000}`,
+            notes: "Enrollment initialized via specialist assignment.",
+            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            insurance: "Aetna (Primary)",
             assignedSpecialist: specialist
           };
           return [newEnrollment, ...prev];
@@ -155,12 +189,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setFacilities(prev => prev.map(f => f.id === id ? { ...f, assignedSpecialist: specialist } : f));
   };
 
+  const addEnrollment = (data: Omit<EnrollmentRecord, 'id'>) => {
+    const newRecord: EnrollmentRecord = {
+      id: Math.floor(1000 + Math.random() * 90000),
+      ...data,
+      date: data.dateOfSubmission,
+      insurance: data.payer,
+      assignedSpecialist: data.responsibleUser
+    };
+    setEnrollments(prev => [newRecord, ...prev]);
+  };
+
   const updateEnrollmentStatus = (id: number, status: StatusType) => {
     setEnrollments(prev => prev.map(e => e.id === id ? { ...e, status: status as any } : e));
   };
 
   const assignEnrollmentSpecialist = (id: number, specialist: string) => {
-    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, assignedSpecialist: specialist } : e));
+    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, assignedSpecialist: specialist, responsibleUser: specialist } : e));
+  };
+
+  const updateEnrollmentDetails = (id: number, updates: Partial<EnrollmentRecord>) => {
+    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
   };
 
   const isSuperAdmin = currentPersona.role === 'SUPER_ADMIN';
@@ -180,6 +229,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateRole,
         deleteRole,
         users,
+        addUser,
         updateUserRole,
         providers,
         updateProviderStatus,
@@ -188,8 +238,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateFacilityStatus,
         assignFacilitySpecialist,
         enrollments,
+        addEnrollment,
         updateEnrollmentStatus,
         assignEnrollmentSpecialist,
+        updateEnrollmentDetails,
         availableSpecialists,
         isSuperAdmin,
         isAdmin,

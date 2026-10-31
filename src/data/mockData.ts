@@ -69,12 +69,26 @@ export interface DocumentRecord {
 export interface EnrollmentRecord {
   id: number;
   providerName: string;
-  date: string;
   organization: string;
   service: string;
-  insurance: string;
+  state: string;
+  type: string;
+  payer: string;
+  priority: 'High' | 'Medium' | 'Low' | 'Standard';
   status: 'PENDING' | 'ACTIVE' | 'SUBMITTED';
-  assignedSpecialist: string;
+  dateOfSubmission: string;
+  referenceNumber: string;
+  followUpDate: string;
+  responsibleUser: string;
+  effectiveDate: string;
+  recredentialingDate: string;
+  providerInsuranceId: string;
+  notes: string;
+
+  // Backward-compatibility aliases
+  date?: string;
+  insurance?: string;
+  assignedSpecialist?: string;
 }
 
 export interface UserRecord {
@@ -227,13 +241,13 @@ export const initialRoles: RoleDefinition[] = [
 ];
 
 export const initialProviders: ProviderApplication[] = [
-  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Sarah Jenkins" },
+  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
   { id: 540, name: "Iris Hines", date: "Oct 27, 2026", email: "hinesiris323@gmail.com", phone: "+1 9123468863", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "David Miller" },
   { id: 539, name: "Prathum", date: "Oct 27, 2026", email: "prathum@mantra.care", phone: "7042955825", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01" },
   { id: 538, name: "Alcira Osayi", date: "Oct 27, 2026", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", service: "THERAPY", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null },
   { id: 537, name: "Nick Spinks", date: "Oct 27, 2026", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null },
   { id: 536, name: "Emily Richards", date: "Oct 27, 2026", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null },
-  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "NEEDS INFO", assignedSpecialist: "Sarah Jenkins" },
+  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
   { id: 534, name: "John Zavaiydriga", date: "Oct 26, 2026", email: "jjzavaiydriga@gmail.com", phone: "+1 3187803280", organization: "MantraCare", service: "PHYSIOTHERAPY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
   { id: 533, name: "Mr Philip Joyce", date: "Oct 26, 2026", email: "phil.joyce13@gmail.com", phone: "+44 07730886536", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null },
   { id: 532, name: "Jodhi Wood Gaudet", date: "Oct 26, 2026", email: "outofthewoodscounselling@outl...", phone: "+1 5145673557", organization: "MantraCare", service: "THERAPY", country: "Canada", countryFlag: "🇨🇦", status: "SUBMITTED", assignedSpecialist: "David Miller" }
@@ -264,16 +278,226 @@ export const initialDocuments: DocumentRecord[] = [
 ];
 
 export const initialEnrollments: EnrollmentRecord[] = [
-  { id: 74, providerName: "Veni Jain", date: "Sep 28, 2026", organization: "MantraCare", service: "THERAPY", insurance: "Aetna", status: "PENDING", assignedSpecialist: "Sarah Jenkins" },
-  { id: 73, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "Vitality", status: "ACTIVE", assignedSpecialist: "David Miller" },
-  { id: 72, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "WPA", status: "ACTIVE", assignedSpecialist: "David Miller" },
-  { id: 71, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "Aviva", status: "ACTIVE", assignedSpecialist: "David Miller" },
-  { id: 70, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "AXA Health", status: "ACTIVE", assignedSpecialist: "Sarah Jenkins" },
-  { id: 69, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "Bupa", status: "PENDING", assignedSpecialist: "Sarah Jenkins" },
-  { id: 68, providerName: "Joanna Sims", date: "Sep 8, 2026", organization: "MantraCare UK", service: "DIETITIAN", insurance: "Aviva", status: "ACTIVE", assignedSpecialist: "Alex Chen" },
-  { id: 67, providerName: "Rick Baumgartle", date: "Sep 1, 2026", organization: "MantraCare", service: "THERAPY", insurance: "Aetna", status: "ACTIVE", assignedSpecialist: "Sarah Jenkins" },
-  { id: 66, providerName: "Steven Haag", date: "Sep 1, 2026", organization: "MantraCare", service: "THERAPY", insurance: "Aetna", status: "ACTIVE", assignedSpecialist: "Anshul Gupta01" },
-  { id: 65, providerName: "Rick Baumgartle", date: "Aug 20, 2026", organization: "MantraCare", service: "THERAPY", insurance: "Aetna", status: "SUBMITTED", assignedSpecialist: "Alex Chen" }
+  {
+    id: 74,
+    providerName: "Veni Jain",
+    organization: "MantraCare",
+    service: "THERAPY",
+    state: "New York (NY)",
+    type: "Commercial",
+    payer: "Aetna",
+    priority: "High",
+    status: "PENDING",
+    dateOfSubmission: "Sep 28, 2026",
+    referenceNumber: "REF-AET-99214",
+    followUpDate: "Nov 14, 2026",
+    responsibleUser: "Sarah Jenkins",
+    effectiveDate: "Dec 01, 2026",
+    recredentialingDate: "Dec 01, 2028",
+    providerInsuranceId: "AET-NY-88492",
+    notes: "Submitted via Availity portal on 09/28. Payer acknowledged receipt; awaiting final panel confirmation.",
+    date: "Sep 28, 2026",
+    insurance: "Aetna",
+    assignedSpecialist: "Sarah Jenkins"
+  },
+  {
+    id: 73,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "Vitality",
+    priority: "High",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-VIT-44012",
+    followUpDate: "Oct 20, 2026",
+    responsibleUser: "David Miller",
+    effectiveDate: "Oct 01, 2026",
+    recredentialingDate: "Oct 01, 2028",
+    providerInsuranceId: "VIT-UK-44910",
+    notes: "Contract executed. Provider recognition code issued and active for direct invoice settlement.",
+    date: "Sep 8, 2026",
+    insurance: "Vitality",
+    assignedSpecialist: "David Miller"
+  },
+  {
+    id: 72,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "WPA",
+    priority: "Standard",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-WPA-22108",
+    followUpDate: "Oct 15, 2026",
+    responsibleUser: "David Miller",
+    effectiveDate: "Sep 25, 2026",
+    recredentialingDate: "Sep 25, 2028",
+    providerInsuranceId: "WPA-PR-90214",
+    notes: "Approved under Dietitian recognized provider roster. Invoicing live.",
+    date: "Sep 8, 2026",
+    insurance: "WPA",
+    assignedSpecialist: "David Miller"
+  },
+  {
+    id: 71,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "Aviva",
+    priority: "Standard",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-AVV-88319",
+    followUpDate: "Nov 01, 2026",
+    responsibleUser: "David Miller",
+    effectiveDate: "Oct 15, 2026",
+    recredentialingDate: "Oct 15, 2028",
+    providerInsuranceId: "AVV-UK-77312",
+    notes: "Fee schedule agreement accepted. Direct settlement enabled.",
+    date: "Sep 8, 2026",
+    insurance: "Aviva",
+    assignedSpecialist: "David Miller"
+  },
+  {
+    id: 70,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "AXA Health",
+    priority: "High",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-AXA-55920",
+    followUpDate: "Oct 30, 2026",
+    responsibleUser: "Sarah Jenkins",
+    effectiveDate: "Oct 01, 2026",
+    recredentialingDate: "Oct 01, 2028",
+    providerInsuranceId: "AXA-UK-62041",
+    notes: "Provider number linked to MantraCare UK clinic group profile.",
+    date: "Sep 8, 2026",
+    insurance: "AXA Health",
+    assignedSpecialist: "Sarah Jenkins"
+  },
+  {
+    id: 69,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "Bupa",
+    priority: "High",
+    status: "PENDING",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-BUP-11924",
+    followUpDate: "Nov 10, 2026",
+    responsibleUser: "Sarah Jenkins",
+    effectiveDate: "Pending",
+    recredentialingDate: "—",
+    providerInsuranceId: "BUP-PEND-1029",
+    notes: "Application pending background credentialing review with Bupa Medical Panel. Follow-up scheduled for Friday.",
+    date: "Sep 8, 2026",
+    insurance: "Bupa",
+    assignedSpecialist: "Sarah Jenkins"
+  },
+  {
+    id: 68,
+    providerName: "Joanna Sims",
+    organization: "MantraCare UK",
+    service: "DIETITIAN",
+    state: "UK - National",
+    type: "Commercial",
+    payer: "Aviva",
+    priority: "Standard",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 8, 2026",
+    referenceNumber: "REF-AVV-99120",
+    followUpDate: "Nov 05, 2026",
+    responsibleUser: "Alex Chen",
+    effectiveDate: "Sep 20, 2026",
+    recredentialingDate: "Sep 20, 2028",
+    providerInsuranceId: "AVV-UK-77312",
+    notes: "Contract validated and active.",
+    date: "Sep 8, 2026",
+    insurance: "Aviva",
+    assignedSpecialist: "Alex Chen"
+  },
+  {
+    id: 67,
+    providerName: "Rick Baumgartle",
+    organization: "MantraCare",
+    service: "THERAPY",
+    state: "California (CA)",
+    type: "Commercial",
+    payer: "Aetna",
+    priority: "Standard",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 1, 2026",
+    referenceNumber: "REF-AET-77192",
+    followUpDate: "Dec 01, 2026",
+    responsibleUser: "Sarah Jenkins",
+    effectiveDate: "Sep 15, 2026",
+    recredentialingDate: "Sep 15, 2028",
+    providerInsuranceId: "AET-CA-33921",
+    notes: "Fully credentialed and loaded in Aetna CA provider directory.",
+    date: "Sep 1, 2026",
+    insurance: "Aetna",
+    assignedSpecialist: "Sarah Jenkins"
+  },
+  {
+    id: 66,
+    providerName: "Steven Haag",
+    organization: "MantraCare",
+    service: "THERAPY",
+    state: "Florida (FL)",
+    type: "Commercial",
+    payer: "Aetna",
+    priority: "Standard",
+    status: "ACTIVE",
+    dateOfSubmission: "Sep 1, 2026",
+    referenceNumber: "REF-AET-66301",
+    followUpDate: "Dec 10, 2026",
+    responsibleUser: "Anshul Gupta01",
+    effectiveDate: "Sep 20, 2026",
+    recredentialingDate: "Sep 20, 2028",
+    providerInsuranceId: "AET-FL-55102",
+    notes: "Active in-network provider.",
+    date: "Sep 1, 2026",
+    insurance: "Aetna",
+    assignedSpecialist: "Anshul Gupta01"
+  },
+  {
+    id: 65,
+    providerName: "Rick Baumgartle",
+    organization: "MantraCare",
+    service: "THERAPY",
+    state: "Texas (TX)",
+    type: "Commercial",
+    payer: "Aetna",
+    priority: "Medium",
+    status: "SUBMITTED",
+    dateOfSubmission: "Aug 20, 2026",
+    referenceNumber: "REF-AET-33290",
+    followUpDate: "Nov 18, 2026",
+    responsibleUser: "Alex Chen",
+    effectiveDate: "Pending",
+    recredentialingDate: "—",
+    providerInsuranceId: "AET-TX-PEND-09",
+    notes: "Initial contracting packet submitted to Texas contracting committee. Awaiting response.",
+    date: "Aug 20, 2026",
+    insurance: "Aetna",
+    assignedSpecialist: "Alex Chen"
+  }
 ];
 
 export const initialUsers: UserRecord[] = [
