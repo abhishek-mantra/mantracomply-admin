@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 export const PIPELINE_STAGES = [
   'Pending',
   'On Hold',
+  'Need Information',
   'In Progress',
   'Request form Submitted',
   'LOI Submitted',
   'Network Status Verification',
-  'Need Information',
   'Network Close/Not Accepting',
   'Submitted',
   'Enrolled',
@@ -31,11 +31,11 @@ interface PipelineStageBarProps {
 export const SEGMENT_COLORS = [
   'bg-[#ef4444]', // 1: Pending (Coral Red)
   'bg-[#f59e0b]', // 2: On Hold (Amber)
-  'bg-[#64748b]', // 3: In Progress (Slate Grey)
-  'bg-[#f97316]', // 4: Request form Submitted (Orange)
-  'bg-[#0ea5e9]', // 5: LOI Submitted (Sky Blue)
-  'bg-[#3b82f6]', // 6: Network Status Verification (Royal Blue)
-  'bg-[#6366f1]', // 7: Need Information (Indigo)
+  'bg-[#6366f1]', // 3: Need Information (Indigo)
+  'bg-[#64748b]', // 4: In Progress (Slate Grey)
+  'bg-[#f97316]', // 5: Request form Submitted (Orange)
+  'bg-[#0ea5e9]', // 6: LOI Submitted (Sky Blue)
+  'bg-[#3b82f6]', // 7: Network Status Verification (Royal Blue)
   'bg-[#d97706]', // 8: Network Close/Not Accepting (Warm Ochre)
   'bg-[#8b5cf6]', // 9: Submitted (Purple)
   'bg-[#10b981]', // 10: Enrolled (Emerald Green)

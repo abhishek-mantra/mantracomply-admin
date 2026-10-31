@@ -69,11 +69,11 @@ export interface DocumentRecord {
 export type EnrollmentStatus = 
   | 'Pending'
   | 'On Hold'
+  | 'Need Information'
   | 'In Progress'
   | 'Request form Submitted'
   | 'LOI Submitted'
   | 'Network Status Verification'
-  | 'Need Information'
   | 'Network Close/Not Accepting'
   | 'Submitted'
   | 'Enrolled'
@@ -84,11 +84,11 @@ export type EnrollmentStatus =
 export const enrollmentStatusOptions: EnrollmentStatus[] = [
   'Pending',
   'On Hold',
+  'Need Information',
   'In Progress',
   'Request form Submitted',
   'LOI Submitted',
   'Network Status Verification',
-  'Need Information',
   'Network Close/Not Accepting',
   'Submitted',
   'Enrolled',
