@@ -68,34 +68,32 @@ export interface DocumentRecord {
 
 export type EnrollmentStatus = 
   | 'Pending'
+  | 'On Hold'
   | 'In Progress'
-  | 'Submitted'
   | 'Request form Submitted'
   | 'LOI Submitted'
   | 'Network Status Verification'
   | 'Need Information'
+  | 'Network Close/Not Accepting'
+  | 'Submitted'
   | 'Enrolled'
-  | 'Inactive'
-  | 'Network Close'
-  | 'On Hold'
   | 'Rejected'
-  | 'Not Accepting'
+  | 'Inactive'
   | string;
 
 export const enrollmentStatusOptions: EnrollmentStatus[] = [
   'Pending',
+  'On Hold',
   'In Progress',
   'Request form Submitted',
   'LOI Submitted',
-  'Submitted',
   'Network Status Verification',
   'Need Information',
+  'Network Close/Not Accepting',
+  'Submitted',
   'Enrolled',
-  'On Hold',
-  'Inactive',
-  'Network Close',
-  'Not Accepting',
-  'Rejected'
+  'Rejected',
+  'Inactive'
 ];
 
 export interface ClientActivity {
@@ -557,7 +555,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     type: "Commercial",
     payer: "Aetna",
     priority: "Medium",
-    status: "Not Accepting",
+    status: "Network Close/Not Accepting",
     dateOfSubmission: "Aug 20, 2026",
     referenceNumber: "REF-AET-33290",
     followUpDate: "Nov 18, 2026",

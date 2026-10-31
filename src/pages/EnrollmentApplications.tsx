@@ -36,7 +36,7 @@ const DEFAULT_COLUMNS: ColumnDef[] = [
   { id: 'type', label: 'Type', visible: true, minWidth: '120px' },
   { id: 'payer', label: 'Payer', visible: true, minWidth: '140px' },
   { id: 'priority', label: 'Priority', visible: true, minWidth: '110px' },
-  { id: 'stage', label: 'Stage', visible: true, minWidth: '190px' },
+  { id: 'stage', label: 'Stage', visible: true, minWidth: '230px' },
   { id: 'dateOfSubmission', label: 'Date of Submission', visible: true, minWidth: '150px' },
   { id: 'referenceNumber', label: 'Reference Number', visible: true, minWidth: '150px' },
   { id: 'followUpDate', label: 'Follow Up Date', visible: true, minWidth: '130px' },

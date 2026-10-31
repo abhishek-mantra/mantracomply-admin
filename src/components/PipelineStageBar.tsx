@@ -1,26 +1,25 @@
 import React, { useState } from 'react';
 
-export const MILESTONE_STAGES = [
+export const PIPELINE_STAGES = [
   'Pending',
+  'On Hold',
   'In Progress',
   'Request form Submitted',
   'LOI Submitted',
-  'Submitted',
   'Network Status Verification',
   'Need Information',
-  'Enrolled'
+  'Network Close/Not Accepting',
+  'Submitted',
+  'Enrolled',
+  'Rejected',
+  'Inactive'
 ] as const;
 
-export const ALL_PIPELINE_STAGES = [
-  ...MILESTONE_STAGES,
-  'On Hold',
-  'Inactive',
-  'Network Close',
-  'Not Accepting',
-  'Rejected'
-] as const;
+// Backward-compatibility aliases
+export const ALL_PIPELINE_STAGES = PIPELINE_STAGES;
+export const MILESTONE_STAGES = PIPELINE_STAGES;
 
-export type PipelineStage = typeof ALL_PIPELINE_STAGES[number];
+export type PipelineStage = typeof PIPELINE_STAGES[number];
 
 interface PipelineStageBarProps {
   status: string;
@@ -28,19 +27,35 @@ interface PipelineStageBarProps {
   className?: string;
 }
 
-// 8 exact segment colors matching user screenshots (Red, Slate, Green, Blue, Purple, Violet, Pink, Cyan)
-const SEGMENT_COLORS = [
-  'bg-[#ef4444]', // 1: Red
-  'bg-[#64748b]', // 2: Slate Grey
-  'bg-[#10b981]', // 3: Emerald Green
-  'bg-[#3b82f6]', // 4: Blue
-  'bg-[#8b5cf6]', // 5: Purple
-  'bg-[#a855f7]', // 6: Violet
-  'bg-[#ec4899]', // 7: Pink / Magenta
-  'bg-[#06b6d4]', // 8: Cyan / Teal
+// 12 distinct progression segment colors matching user screenshots & stage order
+export const SEGMENT_COLORS = [
+  'bg-[#ef4444]', // 1: Pending (Coral Red)
+  'bg-[#f59e0b]', // 2: On Hold (Amber)
+  'bg-[#64748b]', // 3: In Progress (Slate Grey)
+  'bg-[#f97316]', // 4: Request form Submitted (Orange)
+  'bg-[#0ea5e9]', // 5: LOI Submitted (Sky Blue)
+  'bg-[#3b82f6]', // 6: Network Status Verification (Royal Blue)
+  'bg-[#6366f1]', // 7: Need Information (Indigo)
+  'bg-[#d97706]', // 8: Network Close/Not Accepting (Warm Ochre)
+  'bg-[#8b5cf6]', // 9: Submitted (Purple)
+  'bg-[#10b981]', // 10: Enrolled (Emerald Green)
+  'bg-[#e11d48]', // 11: Rejected (Rose Red)
+  'bg-[#94a3b8]', // 12: Inactive (Muted Slate)
 ];
 
-const TOTAL_SEGMENTS = 8;
+export const TOTAL_SEGMENTS = 12;
+
+export function normalizePipelineStatus(raw: string): string {
+  if (!raw) return 'Pending';
+  const trimmed = raw.trim();
+  if (trimmed === 'ACTIVE') return 'Enrolled';
+  if (trimmed === 'PENDING') return 'Pending';
+  if (trimmed === 'SUBMITTED') return 'Submitted';
+  if (trimmed === 'Network Close' || trimmed === 'Not Accepting') return 'Network Close/Not Accepting';
+
+  const match = PIPELINE_STAGES.find(s => s.toLowerCase() === trimmed.toLowerCase());
+  return match || trimmed;
+}
 
 export const PipelineStageBar: React.FC<PipelineStageBarProps> = ({
   status,
@@ -49,62 +64,30 @@ export const PipelineStageBar: React.FC<PipelineStageBarProps> = ({
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // Normalize legacy status names
+  // Normalize legacy and incoming status names
   const normalizedStatus = React.useMemo(() => {
-    if (status === 'ACTIVE') return 'Enrolled';
-    if (status === 'PENDING') return 'Pending';
-    if (status === 'SUBMITTED') return 'Submitted';
-    return status || 'Pending';
+    return normalizePipelineStatus(status);
   }, [status]);
 
-  // Determine how many segments to fill (1 to 8)
+  // Determine how many segments to fill (1 to 12)
   const filledCount = React.useMemo(() => {
-    switch (normalizedStatus) {
-      case 'Pending':
-        return 1;
-      case 'In Progress':
-        return 2;
-      case 'Request form Submitted':
-        return 3;
-      case 'LOI Submitted':
-        return 4;
-      case 'Submitted':
-        return 5;
-      case 'Network Status Verification':
-        return 6;
-      case 'Need Information':
-        return 7;
-      case 'Enrolled':
-        return 8;
-      case 'On Hold':
-        return 4;
-      case 'Inactive':
-        return 2;
-      case 'Network Close':
-      case 'Not Accepting':
-        return 3;
-      case 'Rejected':
-        return 2;
-      default: {
-        const found = MILESTONE_STAGES.indexOf(normalizedStatus as any);
-        return found !== -1 ? found + 1 : 1;
-      }
-    }
+    const foundIdx = PIPELINE_STAGES.findIndex(
+      (s) => s.toLowerCase() === normalizedStatus.toLowerCase()
+    );
+    return foundIdx !== -1 ? foundIdx + 1 : 1;
   }, [normalizedStatus]);
-
-  const isTerminalOrHold = ['On Hold', 'Inactive', 'Network Close', 'Not Accepting', 'Rejected'].includes(normalizedStatus);
 
   return (
     <div className={`relative inline-flex flex-col items-start gap-1 p-0.5 select-none ${className}`}>
-      {/* Floating Hover Tooltip (Matching Screenshot 3 pill) */}
+      {/* Floating Hover Tooltip showing exact stage on hover */}
       {hoveredIdx !== null && (
         <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#0f172a] text-white text-[9px] font-bold rounded-full shadow-lg whitespace-nowrap z-30 pointer-events-none flex items-center gap-1 animate-in fade-in zoom-in-95 duration-100">
-          <span>{MILESTONE_STAGES[hoveredIdx]}</span>
+          <span>{PIPELINE_STAGES[hoveredIdx]}</span>
           <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#0f172a] rotate-45" />
         </div>
       )}
 
-      {/* Segmented Pipeline Bar of 8 boxes (Clicking any box immediately changes the stage - NO DROPDOWN) */}
+      {/* Segmented Pipeline Bar of 12 boxes (Clicking any box immediately changes the stage - NO DROPDOWN) */}
       <div 
         className="flex items-center gap-[2.5px] p-[2.5px] bg-slate-50/80 border border-slate-200/90 rounded-[4px] shadow-2xs hover:border-slate-300 transition-colors"
         role="group"
@@ -112,19 +95,8 @@ export const PipelineStageBar: React.FC<PipelineStageBarProps> = ({
       >
         {Array.from({ length: TOTAL_SEGMENTS }).map((_, idx) => {
           const isFilled = idx < filledCount;
-          let barColor = isFilled ? SEGMENT_COLORS[idx] : 'bg-white';
-
-          if (isFilled && isTerminalOrHold) {
-            if (normalizedStatus === 'Rejected') {
-              barColor = 'bg-rose-600';
-            } else if (normalizedStatus === 'On Hold') {
-              barColor = 'bg-amber-500';
-            } else {
-              barColor = 'bg-slate-400';
-            }
-          }
-
-          const targetStage = MILESTONE_STAGES[idx];
+          const barColor = isFilled ? SEGMENT_COLORS[idx] : 'bg-white';
+          const targetStage = PIPELINE_STAGES[idx];
 
           return (
             <button
@@ -148,8 +120,11 @@ export const PipelineStageBar: React.FC<PipelineStageBarProps> = ({
         })}
       </div>
 
-      {/* Uppercase Stage Name underneath without any dropdown arrow (matching Screenshot 2 & 3) */}
-      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-700 whitespace-nowrap truncate max-w-[180px]">
+      {/* Uppercase Stage Name underneath without any dropdown arrow */}
+      <div 
+        className="text-[10px] font-bold uppercase tracking-wider text-slate-700 whitespace-nowrap truncate max-w-[210px]"
+        title={normalizedStatus}
+      >
         {normalizedStatus}
       </div>
     </div>

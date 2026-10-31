@@ -977,7 +977,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                       <th className="py-3 px-4 border-r border-[#1a4a6e]">
                         Process
                       </th>
-                      <th className="py-3 px-4 min-w-[200px] border-r border-[#1a4a6e]">
+                      <th className="py-3 px-4 min-w-[230px] border-r border-[#1a4a6e]">
                         Stage
                       </th>
                       <th className="py-3 px-4 border-r border-[#1a4a6e]">
