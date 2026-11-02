@@ -34,13 +34,17 @@ export interface ProviderApplication {
   email: string;
   phone: string;
   organization: string;
+  organizations?: string[];
   service: string;
   country: string;
   countryFlag: string;
   status: 'DRAFT' | 'NEEDS INFO' | 'APPROVED' | 'SUBMITTED' | 'UNDER REVIEW' | 'REJECTED';
   assignedSpecialist?: string | null;
+  referredBy?: string;
   onboardedBy?: string;
   opsResponsible?: string;
+  credentialingStartDate?: string;
+  enrollmentStartDate?: string;
 }
 
 export interface FacilityApplication {
@@ -51,13 +55,17 @@ export interface FacilityApplication {
   email: string;
   phone: string;
   organization: string;
+  organizations?: string[];
   service: string;
   country: string;
   countryFlag: string;
   status: 'DRAFT' | 'NEEDS INFO' | 'APPROVED' | 'SUBMITTED' | 'UNDER REVIEW' | 'REJECTED';
   assignedSpecialist?: string | null;
+  referredBy?: string;
   onboardedBy?: string;
   opsResponsible?: string;
+  credentialingStartDate?: string;
+  enrollmentStartDate?: string;
 }
 
 export interface DocumentRecord {
@@ -171,6 +179,7 @@ export interface UserRecord {
   email: string;
   phone: string;
   organization: string;
+  organizations?: string[];
   country: string;
   countryFlag: string;
   service: string;
@@ -181,7 +190,22 @@ export interface UserRecord {
     used: number;
     total: number;
   };
+  referredBy?: string;
+  onboardedBy?: string;
+  opsResponsible?: string;
+  credentialingStartDate?: string;
+  enrollmentStartDate?: string;
 }
+
+export const availableOrganizations = [
+  "MantraCare",
+  "MantraCare UK",
+  "Lavender Vision PLLC",
+  "Aetna Network Group",
+  "Kaiser Permanente",
+  "UnitedHealth Group",
+  "Cigna Behavioral"
+];
 
 export const availableSpecialists = [
   "Anshul Gupta01",
@@ -315,26 +339,26 @@ export const initialRoles: RoleDefinition[] = [
 ];
 
 export const initialProviders: ProviderApplication[] = [
-  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
-  { id: 540, name: "Iris Hines", date: "Oct 27, 2026", email: "hinesiris323@gmail.com", phone: "+1 9123468863", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "David Miller", onboardedBy: "Abhishek Madan", opsResponsible: "David Miller" },
-  { id: 539, name: "Prathum", date: "Oct 27, 2026", email: "prathum@mantra.care", phone: "7042955825", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01" },
-  { id: 538, name: "Alcira Osayi", date: "Oct 27, 2026", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", service: "THERAPY", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins" },
-  { id: 537, name: "Nick Spinks", date: "Oct 27, 2026", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Self (Portal)", opsResponsible: "Alex Chen" },
-  { id: 536, name: "Emily Richards", date: "Oct 27, 2026", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "David Miller", opsResponsible: "David Miller" },
-  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
-  { id: 534, name: "John Zavaiydriga", date: "Oct 26, 2026", email: "jjzavaiydriga@gmail.com", phone: "+1 3187803280", organization: "MantraCare", service: "PHYSIOTHERAPY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Ops Intake", opsResponsible: "Sarah Jenkins" },
-  { id: 533, name: "Mr Philip Joyce", date: "Oct 26, 2026", email: "phil.joyce13@gmail.com", phone: "+44 07730886536", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Abhishek Madan", opsResponsible: "Alex Chen" },
-  { id: 532, name: "Jodhi Wood Gaudet", date: "Oct 26, 2026", email: "outofthewoodscounselling@outl...", phone: "+1 5145673557", organization: "MantraCare", service: "THERAPY", country: "Canada", countryFlag: "🇨🇦", status: "SUBMITTED", assignedSpecialist: "David Miller", onboardedBy: "Self (Portal)", opsResponsible: "David Miller" }
+  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", organizations: ["MantraCare"], service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", referredBy: "Self Referral", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 28, 2026", enrollmentStartDate: "Nov 14, 2026" },
+  { id: 540, name: "Iris Hines", date: "Oct 27, 2026", email: "hinesiris323@gmail.com", phone: "+1 9123468863", organization: "MantraCare", organizations: ["MantraCare"], service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "David Miller", referredBy: "Abhishek Madan", onboardedBy: "Abhishek Madan", opsResponsible: "David Miller", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Pending" },
+  { id: 539, name: "Prathum", date: "Oct 27, 2026", email: "prathum@mantra.care", phone: "7042955825", organization: "MantraCare", organizations: ["MantraCare"], service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", referredBy: "Internal", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 538, name: "Alcira Osayi", date: "Oct 27, 2026", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", organizations: ["MantraCare"], service: "THERAPY", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, referredBy: "Portal (Direct)", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 10, 2026" },
+  { id: 537, name: "Nick Spinks", date: "Oct 27, 2026", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", organizations: ["MantraCare UK"], service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, referredBy: "Healthcare Staffing", onboardedBy: "Self (Portal)", opsResponsible: "Alex Chen", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 12, 2026" },
+  { id: 536, name: "Emily Richards", date: "Oct 27, 2026", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", organizations: ["Lavender Vision PLLC"], service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, referredBy: "Direct Clinic", onboardedBy: "David Miller", opsResponsible: "David Miller", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 01, 2026" },
+  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", organizations: ["MantraCare"], service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", referredBy: "Portal (Direct)", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 05, 2026" },
+  { id: 534, name: "John Zavaiydriga", date: "Oct 26, 2026", email: "jjzavaiydriga@gmail.com", phone: "+1 3187803280", organization: "MantraCare", organizations: ["MantraCare"], service: "PHYSIOTHERAPY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", referredBy: "Clinical Partner", onboardedBy: "Ops Intake", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 26, 2026", enrollmentStartDate: "Nov 08, 2026" },
+  { id: 533, name: "Mr Philip Joyce", date: "Oct 26, 2026", email: "phil.joyce13@gmail.com", phone: "+44 07730886536", organization: "MantraCare", organizations: ["MantraCare UK"], service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, referredBy: "Abhishek Madan", onboardedBy: "Abhishek Madan", opsResponsible: "Alex Chen", credentialingStartDate: "Oct 26, 2026", enrollmentStartDate: "—" },
+  { id: 532, name: "Jodhi Wood Gaudet", date: "Oct 26, 2026", email: "outofthewoodscounselling@outl...", phone: "+1 5145673557", organization: "MantraCare", organizations: ["MantraCare"], service: "THERAPY", country: "Canada", countryFlag: "🇨🇦", status: "SUBMITTED", assignedSpecialist: "David Miller", referredBy: "Canadian Health Network", onboardedBy: "Self (Portal)", opsResponsible: "David Miller", credentialingStartDate: "Oct 26, 2026", enrollmentStartDate: "Nov 18, 2026" }
 ];
 
 export const initialFacilities: FacilityApplication[] = [
-  { id: "1", name: "Rachel", type: "GROUP", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Abhishek Madan", opsResponsible: "Anshul Gupta01" },
-  { id: "2", name: "Rachel", type: "GROUP", date: "Aug 14, 2026", email: "veni@mantra.care", phone: "123", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "UNDER REVIEW", assignedSpecialist: "David Miller", onboardedBy: "Self (Portal)", opsResponsible: "David Miller" },
-  { id: "3", name: "Tabula Rasa Inc", type: "GROUP", date: "Aug 22, 2026", email: "IncTabulaRasa@gmail.com", phone: "605-891-4377", organization: "Tabula Rasa Inc", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins" },
-  { id: "4", name: "4313046171", type: "FACILITY", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "REJECTED", assignedSpecialist: null, onboardedBy: "Ops Intake", opsResponsible: "Alex Chen" },
-  { id: "5", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "David Miller", onboardedBy: "David Miller", opsResponsible: "David Miller" },
-  { id: "6", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
-  { id: "7", name: "adsfd", type: "FACILITY", date: "Aug 22, 2026", email: "—", phone: "—", organization: "Kanak's clinic", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "SUBMITTED", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01" }
+  { id: "1", name: "Rachel", type: "GROUP", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", organizations: ["MantraCare"], service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", referredBy: "Abhishek Madan", onboardedBy: "Abhishek Madan", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Aug 20, 2026", enrollmentStartDate: "—" },
+  { id: "2", name: "Rachel", type: "GROUP", date: "Aug 14, 2026", email: "veni@mantra.care", phone: "123", organization: "MantraCare", organizations: ["MantraCare"], service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "UNDER REVIEW", assignedSpecialist: "David Miller", referredBy: "Self Referral", onboardedBy: "Self (Portal)", opsResponsible: "David Miller", credentialingStartDate: "Aug 14, 2026", enrollmentStartDate: "Pending" },
+  { id: "3", name: "Tabula Rasa Inc", type: "GROUP", date: "Aug 22, 2026", email: "IncTabulaRasa@gmail.com", phone: "605-891-4377", organization: "Tabula Rasa Inc", organizations: ["Tabula Rasa Inc"], service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, referredBy: "Sarah Jenkins", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Aug 22, 2026", enrollmentStartDate: "—" },
+  { id: "4", name: "4313046171", type: "FACILITY", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", organizations: ["MantraCare"], service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "REJECTED", assignedSpecialist: null, referredBy: "Ops Intake", onboardedBy: "Ops Intake", opsResponsible: "Alex Chen", credentialingStartDate: "Aug 20, 2026", enrollmentStartDate: "—" },
+  { id: "5", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", organizations: ["Tabula Rasa Inc"], service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "David Miller", referredBy: "David Miller", onboardedBy: "David Miller", opsResponsible: "David Miller", credentialingStartDate: "Aug 24, 2026", enrollmentStartDate: "Sep 01, 2026" },
+  { id: "6", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", organizations: ["Tabula Rasa Inc"], service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", referredBy: "Self (Portal)", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Aug 24, 2026", enrollmentStartDate: "Sep 05, 2026" },
+  { id: "7", name: "adsfd", type: "FACILITY", date: "Aug 22, 2026", email: "—", phone: "—", organization: "Kanak's clinic", organizations: ["Kanak's clinic"], service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "SUBMITTED", assignedSpecialist: "Anshul Gupta01", referredBy: "Self (Portal)", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Aug 22, 2026", enrollmentStartDate: "Sep 15, 2026" }
 ];
 
 export const initialDocuments: DocumentRecord[] = [
@@ -575,16 +599,136 @@ export const initialEnrollments: EnrollmentRecord[] = [
 ];
 
 export const initialUsers: UserRecord[] = [
-  { id: 1031, name: "Anshul Gupta01", email: "eyemantratirupur04@gmail.com", phone: "+1 6502391024", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "OPERATIONS", signupDate: "Aug 10, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1030, name: "Parker Layne", email: "parkerlayne77@gmail.com", phone: "+1 4342034048", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1029, name: "Sophia Kariotaki", email: "skariotaki@yahoo.com", phone: "+44 07593236943", organization: "MantraCare", country: "United Kingdom", countryFlag: "🇬🇧", service: "—", signupDate: "Oct 27, 2026", role: "CREDENTIALING_SPECIALIST", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1028, name: "Tracey Rowlands", email: "tracey700@aol.com", phone: "+44 07753511109", organization: "MantraCare", country: "United Kingdom", countryFlag: "🇬🇧", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1027, name: "Elizabeth Self Lingle", email: "lizzyself002@gmail.com", phone: "+1 6019415803", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1026, name: "Nicole Jean Magpayo", email: "nicolemagpayo3@gmail.com", phone: "+63 9164641521", organization: "MantraCare", country: "Philippines", countryFlag: "🇵🇭", service: "—", signupDate: "Oct 27, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1025, name: "Kathleen Diblin", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "SPEECH THERAPIST", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1024, name: "Princesa Cardenas", email: "blossom02pyc@gmail.com", phone: "+1 5402215732", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "CREDENTIALING_SPECIALIST", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1023, name: "Alcira Osayi", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "THERAPY", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1022, name: "Kayla Sitton", email: "kaylasitton432@gmail.com", phone: "+1 9702164307", organization: "MantraCare", country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1021, name: "Nick Spinks", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", country: "United Kingdom", countryFlag: "🇬🇧", service: "THERAPY", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 } },
-  { id: 1020, name: "Emily Richards", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", country: "United States", countryFlag: "🇺🇸", service: "OTHERSERVICES", signupDate: "Oct 27, 2026", role: "ORG ADMIN", status: "Active", credits: { used: 0, total: 0 } }
+  {
+    id: 1038,
+    name: "Nancy Brooks",
+    email: "drnancybrooks@gmail.com",
+    phone: "+1 7174905619",
+    organization: "MantraCare",
+    organizations: ["MantraCare", "MantraCare UK"],
+    country: "Canada",
+    countryFlag: "🇨🇦",
+    service: "THERAPY",
+    signupDate: "Oct 29, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "Portal (Direct)",
+    onboardedBy: "Sarah Jenkins",
+    opsResponsible: "Sarah Jenkins",
+    credentialingStartDate: "Oct 29, 2026",
+    enrollmentStartDate: "Nov 15, 2026"
+  },
+  {
+    id: 1037,
+    name: "Nataly Briceno Guerrero",
+    email: "bricenoguerreronataly@gmail.com",
+    phone: "+1 2172009031",
+    organization: "MantraCare",
+    organizations: ["MantraCare"],
+    country: "United States",
+    countryFlag: "🇺🇸",
+    service: "OCCUPATIONAL THERAPIST",
+    signupDate: "Oct 29, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "Dr. Robert Vance",
+    onboardedBy: "David Miller",
+    opsResponsible: "David Miller",
+    credentialingStartDate: "Oct 29, 2026",
+    enrollmentStartDate: "Pending"
+  },
+  {
+    id: 1036,
+    name: "Sara Hernandez",
+    email: "sara1345@aol.com",
+    phone: "+1 9152616396",
+    organization: "MantraCare",
+    organizations: ["MantraCare", "Aetna Network Group"],
+    country: "United States",
+    countryFlag: "🇺🇸",
+    service: "—",
+    signupDate: "Oct 28, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "Self Referral",
+    onboardedBy: "Sarah Jenkins",
+    opsResponsible: "Sarah Jenkins",
+    credentialingStartDate: "Oct 28, 2026",
+    enrollmentStartDate: "Nov 02, 2026"
+  },
+  {
+    id: 1035,
+    name: "Roschelle Bailey",
+    email: "speechrxpllc@gmail.com",
+    phone: "+1 7042995569",
+    organization: "MantraCare",
+    organizations: ["MantraCare"],
+    country: "United States",
+    countryFlag: "🇺🇸",
+    service: "—",
+    signupDate: "Oct 28, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "Healthcare Staffing",
+    onboardedBy: "David Miller",
+    opsResponsible: "David Miller",
+    credentialingStartDate: "Oct 28, 2026",
+    enrollmentStartDate: "—"
+  },
+  {
+    id: 1034,
+    name: "Jack Norwood",
+    email: "jack.norwood@hotmail.com",
+    phone: "+44 07752068136",
+    organization: "MantraCare",
+    organizations: ["MantraCare", "MantraCare UK"],
+    country: "United Kingdom",
+    countryFlag: "🇬🇧",
+    service: "THERAPY",
+    signupDate: "Oct 28, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "NHS Transition Partner",
+    onboardedBy: "Sarah Jenkins",
+    opsResponsible: "Sarah Jenkins",
+    credentialingStartDate: "Oct 28, 2026",
+    enrollmentStartDate: "Nov 12, 2026"
+  },
+  {
+    id: 1033,
+    name: "Timothy Everton Wilson",
+    email: "tim@twilsonassociates.com",
+    phone: "+1 4166271019",
+    organization: "MantraCare",
+    organizations: ["MantraCare"],
+    country: "Canada",
+    countryFlag: "🇨🇦",
+    service: "THERAPY",
+    signupDate: "Oct 28, 2026",
+    role: "PROVIDER",
+    status: "Active",
+    credits: { used: 0, total: 100 },
+    referredBy: "Canadian Health Network",
+    onboardedBy: "Alex Chen",
+    opsResponsible: "Alex Chen",
+    credentialingStartDate: "Oct 28, 2026",
+    enrollmentStartDate: "Nov 20, 2026"
+  },
+  { id: 1031, name: "Anshul Gupta01", email: "eyemantratirupur04@gmail.com", phone: "+1 6502391024", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "OPERATIONS", signupDate: "Aug 10, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Internal", onboardedBy: "Admin", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Aug 10, 2026", enrollmentStartDate: "Aug 15, 2026" },
+  { id: 1030, name: "Parker Layne", email: "parkerlayne77@gmail.com", phone: "+1 4342034048", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Portal (Direct)", onboardedBy: "David Miller", opsResponsible: "David Miller", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1029, name: "Sophia Kariotaki", email: "skariotaki@yahoo.com", phone: "+44 07593236943", organization: "MantraCare", organizations: ["MantraCare UK"], country: "United Kingdom", countryFlag: "🇬🇧", service: "—", signupDate: "Oct 27, 2026", role: "CREDENTIALING_SPECIALIST", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Ops Recruitment", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1028, name: "Tracey Rowlands", email: "tracey700@aol.com", phone: "+44 07753511109", organization: "MantraCare", organizations: ["MantraCare UK"], country: "United Kingdom", countryFlag: "🇬🇧", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Healthcare Staffing", onboardedBy: "Alex Chen", opsResponsible: "Alex Chen", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 05, 2026" },
+  { id: 1027, name: "Elizabeth Self Lingle", email: "lizzyself002@gmail.com", phone: "+1 6019415803", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Portal (Direct)", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1026, name: "Nicole Jean Magpayo", email: "nicolemagpayo3@gmail.com", phone: "+63 9164641521", organization: "MantraCare", organizations: ["MantraCare"], country: "Philippines", countryFlag: "🇵🇭", service: "—", signupDate: "Oct 27, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Internal", onboardedBy: "Admin", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1025, name: "Kathleen Diblin", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "SPEECH THERAPIST", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Self Referral", onboardedBy: "David Miller", opsResponsible: "David Miller", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 14, 2026" },
+  { id: 1024, name: "Princesa Cardenas", email: "blossom02pyc@gmail.com", phone: "+1 5402215732", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "CREDENTIALING_SPECIALIST", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Ops Recruitment", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1023, name: "Alcira Osayi", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "THERAPY", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Portal (Direct)", onboardedBy: "Alex Chen", opsResponsible: "Alex Chen", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 10, 2026" },
+  { id: 1022, name: "Kayla Sitton", email: "kaylasitton432@gmail.com", phone: "+1 9702164307", organization: "MantraCare", organizations: ["MantraCare"], country: "United States", countryFlag: "🇺🇸", service: "—", signupDate: "Oct 27, 2026", role: "ADMIN", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Internal", onboardedBy: "Admin", opsResponsible: "Anshul Gupta01", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "—" },
+  { id: 1021, name: "Nick Spinks", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", organizations: ["MantraCare UK"], country: "United Kingdom", countryFlag: "🇬🇧", service: "THERAPY", signupDate: "Oct 27, 2026", role: "PROVIDER", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Healthcare Staffing", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 12, 2026" },
+  { id: 1020, name: "Emily Richards", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", organizations: ["Lavender Vision PLLC"], country: "United States", countryFlag: "🇺🇸", service: "OTHERSERVICES", signupDate: "Oct 27, 2026", role: "ORG ADMIN", status: "Active", credits: { used: 0, total: 0 }, referredBy: "Direct Clinic Onboarding", onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins", credentialingStartDate: "Oct 27, 2026", enrollmentStartDate: "Nov 01, 2026" }
 ];

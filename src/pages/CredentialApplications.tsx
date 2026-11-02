@@ -31,11 +31,14 @@ export interface ColumnDef {
 
 const DEFAULT_CREDENTIAL_COLUMNS: ColumnDef[] = [
   { id: 'email', label: 'Email', visible: true, minWidth: '180px' },
-  { id: 'organization', label: 'Organization', visible: true, minWidth: '140px' },
+  { id: 'organization', label: 'Organization', visible: true, minWidth: '160px' },
   { id: 'service', label: 'Service', visible: true, minWidth: '130px' },
   { id: 'country', label: 'Country', visible: true, minWidth: '140px' },
+  { id: 'referredBy', label: 'Referred by', visible: true, minWidth: '150px' },
   { id: 'onboardedBy', label: 'Onboarded by', visible: true, minWidth: '160px' },
   { id: 'opsResponsible', label: 'Ops Responsible', visible: true, minWidth: '180px' },
+  { id: 'credentialingStartDate', label: 'Credentialing start date', visible: true, minWidth: '160px' },
+  { id: 'enrollmentStartDate', label: 'Enrollment start date', visible: true, minWidth: '160px' },
   { id: 'status', label: 'Status', visible: true, minWidth: '140px' }
 ];
 
@@ -442,12 +445,20 @@ export const CredentialApplications: React.FC = () => {
                                   {item.email}
                                 </td>
                               );
-                            case 'organization':
+                            case 'organization': {
+                              const orgList = item.organizations && item.organizations.length > 0 ? item.organizations : [item.organization];
                               return (
-                                <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${borderClass}`}>
-                                  {item.organization}
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    {orgList.map((org, oIdx) => (
+                                      <span key={oIdx} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                        {org}
+                                      </span>
+                                    ))}
+                                  </div>
                                 </td>
                               );
+                            }
                             case 'service':
                               return (
                                 <td key={col.id} className={`py-3 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap ${borderClass}`}>
@@ -459,6 +470,14 @@ export const CredentialApplications: React.FC = () => {
                                 <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${borderClass}`}>
                                   <span className="mr-1.5">{item.countryFlag}</span>
                                   {item.country}
+                                </td>
+                              );
+                            case 'referredBy':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200">
+                                    {item.referredBy || 'Portal (Direct)'}
+                                  </span>
                                 </td>
                               );
                             case 'onboardedBy':
@@ -491,6 +510,26 @@ export const CredentialApplications: React.FC = () => {
                                   ) : (
                                     <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
                                       {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            case 'credentialingStartDate':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-600 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.credentialingStartDate || item.date || '—'}
+                                </td>
+                              );
+                            case 'enrollmentStartDate':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  {item.enrollmentStartDate && item.enrollmentStartDate !== 'Pending' && item.enrollmentStartDate !== '—' ? (
+                                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-xs">
+                                      {item.enrollmentStartDate}
+                                    </span>
+                                  ) : (
+                                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px] font-semibold">
+                                      {item.enrollmentStartDate || 'Pending'}
                                     </span>
                                   )}
                                 </td>
@@ -660,12 +699,20 @@ export const CredentialApplications: React.FC = () => {
                                   {item.email}
                                 </td>
                               );
-                            case 'organization':
+                            case 'organization': {
+                              const orgList = item.organizations && item.organizations.length > 0 ? item.organizations : [item.organization];
                               return (
-                                <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${borderClass}`}>
-                                  {item.organization}
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    {orgList.map((org, oIdx) => (
+                                      <span key={oIdx} className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                        {org}
+                                      </span>
+                                    ))}
+                                  </div>
                                 </td>
                               );
+                            }
                             case 'service':
                               return (
                                 <td key={col.id} className={`py-3 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap ${borderClass}`}>
@@ -677,6 +724,14 @@ export const CredentialApplications: React.FC = () => {
                                 <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${borderClass}`}>
                                   <span className="mr-1.5">{item.countryFlag}</span>
                                   {item.country}
+                                </td>
+                              );
+                            case 'referredBy':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200">
+                                    {item.referredBy || 'Portal (Direct)'}
+                                  </span>
                                 </td>
                               );
                             case 'onboardedBy':
@@ -709,6 +764,26 @@ export const CredentialApplications: React.FC = () => {
                                   ) : (
                                     <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
                                       {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            case 'credentialingStartDate':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-600 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.credentialingStartDate || item.date || '—'}
+                                </td>
+                              );
+                            case 'enrollmentStartDate':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  {item.enrollmentStartDate && item.enrollmentStartDate !== 'Pending' && item.enrollmentStartDate !== '—' ? (
+                                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-xs">
+                                      {item.enrollmentStartDate}
+                                    </span>
+                                  ) : (
+                                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px] font-semibold">
+                                      {item.enrollmentStartDate || 'Pending'}
                                     </span>
                                   )}
                                 </td>

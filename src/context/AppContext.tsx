@@ -13,7 +13,8 @@ import {
   EnrollmentRecord, 
   initialEnrollments, 
   RoleType,
-  availableSpecialists
+  availableSpecialists,
+  availableOrganizations
 } from '../data/mockData';
 import { StatusType } from '../components/StatusBadge';
 
@@ -28,8 +29,12 @@ interface AppContextType {
   deleteRole: (roleId: string) => void;
   
   users: UserRecord[];
-  addUser: (userData: { name: string; email: string; role: RoleType; phone?: string; organization?: string }) => void;
+  addUser: (userData: Partial<UserRecord> & { name: string; email: string; role: RoleType }) => void;
   updateUserRole: (userId: number, newRole: RoleType) => void;
+  updateUser: (userId: number, updates: Partial<UserRecord>) => void;
+  assignUserSpecialist: (userId: number, specialist: string) => void;
+  updateUserOrganizations: (userId: number, organizations: string[]) => void;
+  availableOrganizations: string[];
   
   providers: ProviderApplication[];
   updateProviderStatus: (id: number, status: StatusType) => void;
@@ -103,23 +108,57 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setRoles(prev => prev.filter(r => r.id !== roleId));
   };
 
-  const addUser = (userData: { name: string; email: string; role: RoleType; phone?: string; organization?: string }) => {
+  const addUser = (userData: Partial<UserRecord> & { name: string; email: string; role: RoleType }) => {
+    const orgs = userData.organizations && userData.organizations.length > 0 
+      ? userData.organizations 
+      : [userData.organization || 'MantraCare'];
     const newUser: UserRecord = {
-      id: Date.now(),
+      id: Date.now() % 100000,
       name: userData.name,
       email: userData.email,
       phone: userData.phone || '+1 (555) 000-0000',
-      organization: userData.organization || 'Mantra Care',
-      country: 'United States',
-      countryFlag: '🇺🇸',
-      service: 'Credentialing',
-      signupDate: 'Oct 30, 2026',
+      organization: orgs[0],
+      organizations: orgs,
+      country: userData.country || 'United States',
+      countryFlag: userData.countryFlag || '🇺🇸',
+      service: userData.service || 'Credentialing',
+      signupDate: userData.signupDate || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       role: userData.role,
       status: 'Active',
-      credits: { used: 0, total: 100 }
+      credits: { used: 0, total: 100 },
+      referredBy: userData.referredBy || 'Portal (Direct)',
+      onboardedBy: userData.onboardedBy || currentPersona.name,
+      opsResponsible: userData.opsResponsible || availableSpecialists[0],
+      credentialingStartDate: userData.credentialingStartDate || new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      enrollmentStartDate: userData.enrollmentStartDate || 'Pending'
     };
     setUsers(prev => [newUser, ...prev]);
     setRoles(prev => prev.map(r => r.name === userData.role ? { ...r, userCount: r.userCount + 1 } : r));
+  };
+
+  const updateUser = (userId: number, updates: Partial<UserRecord>) => {
+    setUsers(prev => prev.map(u => {
+      if (u.id === userId) {
+        const updated = { ...u, ...updates };
+        if (updates.organizations && updates.organizations.length > 0 && !updates.organization) {
+          updated.organization = updates.organizations[0];
+        }
+        return updated;
+      }
+      return u;
+    }));
+  };
+
+  const assignUserSpecialist = (userId: number, specialist: string) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { ...u, opsResponsible: specialist } : u));
+  };
+
+  const updateUserOrganizations = (userId: number, organizations: string[]) => {
+    setUsers(prev => prev.map(u => u.id === userId ? { 
+      ...u, 
+      organizations, 
+      organization: organizations[0] || u.organization 
+    } : u));
   };
 
   const updateUserRole = (userId: number, newRole: RoleType) => {
@@ -236,6 +275,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         users,
         addUser,
         updateUserRole,
+        updateUser,
+        assignUserSpecialist,
+        updateUserOrganizations,
+        availableOrganizations,
         providers,
         updateProviderStatus,
         assignProviderSpecialist,
