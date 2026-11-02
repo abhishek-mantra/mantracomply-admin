@@ -670,10 +670,12 @@ export const UsersManagement: React.FC = () => {
                       : [user.organization];
 
                     return (
-                      <tr key={user.id} className="hover:bg-slate-50/80 transition-colors group">
+                      <tr key={user.id} className={`hover:bg-slate-50/80 transition-colors group ${openMenuUserId === user.id ? 'relative z-50' : ''}`}>
                         {/* Col 1: Action Hamburger (≡) with Edit Option */}
-                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 relative">
-                          <div className="relative inline-block text-center">
+                        <td className={`py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border sticky left-0 bg-white group-hover:bg-slate-50 transition-colors relative ${
+                          openMenuUserId === user.id ? 'z-50' : 'z-20'
+                        }`}>
+                          <div className={`relative inline-block text-center ${openMenuUserId === user.id ? 'z-50' : ''}`}>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -694,7 +696,7 @@ export const UsersManagement: React.FC = () => {
                             {openMenuUserId === user.id && (
                               <div
                                 onClick={(e) => e.stopPropagation()}
-                                className={`absolute left-full ml-1 w-52 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                className={`absolute left-full ml-1 w-52 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-[100] text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
                                   isNearBottom ? 'bottom-0' : 'top-0'
                                 }`}
                               >
@@ -724,7 +726,7 @@ export const UsersManagement: React.FC = () => {
                         </td>
 
                         {/* Col 2: USER (Avatar Circle + Name + ID: #1038) */}
-                        <td className="py-3 px-5 border-r border-b border-slate-100 whitespace-nowrap sticky left-[44px] bg-white group-hover:bg-slate-50 transition-colors z-20 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.06)]">
+                        <td className="py-3 px-5 border-r border-b border-slate-100 whitespace-nowrap sticky left-[44px] bg-white group-hover:bg-slate-50 transition-colors z-10 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.06)]">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
                               <UserIcon size={14} />

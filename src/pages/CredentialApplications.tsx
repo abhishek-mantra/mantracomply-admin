@@ -354,10 +354,12 @@ export const CredentialApplications: React.FC = () => {
                   filteredProviders.map((item, idx) => {
                     const isNearBottom = idx >= filteredProviders.length - 2 && filteredProviders.length > 2;
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
+                      <tr key={item.id} className={`hover:bg-slate-50/80 transition-colors group ${openMenuId === item.id ? 'relative z-50' : ''}`}>
                         {/* Col 1: Hamburger Menu Action (≡) */}
-                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative">
-                          <div className="relative inline-block text-center">
+                        <td className={`py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative ${
+                          openMenuId === item.id ? 'z-50' : ''
+                        }`}>
+                          <div className={`relative inline-block text-center ${openMenuId === item.id ? 'z-50' : ''}`}>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -377,7 +379,8 @@ export const CredentialApplications: React.FC = () => {
 
                             {openMenuId === item.id && (
                               <div
-                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                onClick={(e) => e.stopPropagation()}
+                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-[100] text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
                                   isNearBottom ? 'bottom-0' : 'top-0'
                                 }`}
                               >
@@ -605,10 +608,12 @@ export const CredentialApplications: React.FC = () => {
                   filteredFacilities.map((item, idx) => {
                     const isNearBottom = idx >= filteredFacilities.length - 2 && filteredFacilities.length > 2;
                     return (
-                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
+                      <tr key={item.id} className={`hover:bg-slate-50/80 transition-colors group ${openMenuId === item.id ? 'relative z-50' : ''}`}>
                         {/* Col 1: Hamburger Menu Action (≡) */}
-                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative">
-                          <div className="relative inline-block text-center">
+                        <td className={`py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative ${
+                          openMenuId === item.id ? 'z-50' : ''
+                        }`}>
+                          <div className={`relative inline-block text-center ${openMenuId === item.id ? 'z-50' : ''}`}>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -628,7 +633,8 @@ export const CredentialApplications: React.FC = () => {
 
                             {openMenuId === item.id && (
                               <div
-                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                onClick={(e) => e.stopPropagation()}
+                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-[100] text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
                                   isNearBottom ? 'bottom-0' : 'top-0'
                                 }`}
                               >
