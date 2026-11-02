@@ -145,7 +145,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const assignProviderSpecialist = (id: number, specialist: string) => {
     setProviders(prev => prev.map(p => {
       if (p.id === id) {
-        return { ...p, assignedSpecialist: specialist };
+        return { ...p, assignedSpecialist: specialist, opsResponsible: specialist };
       }
       return p;
     }));
@@ -191,7 +191,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const assignFacilitySpecialist = (id: string, specialist: string) => {
-    setFacilities(prev => prev.map(f => f.id === id ? { ...f, assignedSpecialist: specialist } : f));
+    setFacilities(prev => prev.map(f => f.id === id ? { ...f, assignedSpecialist: specialist, opsResponsible: specialist } : f));
   };
 
   const addEnrollment = (data: Omit<EnrollmentRecord, 'id'>) => {

@@ -106,6 +106,24 @@ export const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                 {data.countryFlag} {data.country || '—'}
               </p>
             </div>
+
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+                <UserCheck size={14} /> Onboarded by
+              </div>
+              <p className="text-sm font-medium text-slate-800">
+                {data.onboardedBy || 'Self (Portal)'}
+              </p>
+            </div>
+
+            <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
+                <UserCheck size={14} /> Ops Responsible
+              </div>
+              <p className="text-sm font-medium text-slate-800">
+                {data.opsResponsible || data.assignedSpecialist || 'Unassigned'}
+              </p>
+            </div>
           </div>
 
           <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">

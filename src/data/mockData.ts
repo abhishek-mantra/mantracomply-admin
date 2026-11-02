@@ -39,6 +39,8 @@ export interface ProviderApplication {
   countryFlag: string;
   status: 'DRAFT' | 'NEEDS INFO' | 'APPROVED' | 'SUBMITTED' | 'UNDER REVIEW' | 'REJECTED';
   assignedSpecialist?: string | null;
+  onboardedBy?: string;
+  opsResponsible?: string;
 }
 
 export interface FacilityApplication {
@@ -54,6 +56,8 @@ export interface FacilityApplication {
   countryFlag: string;
   status: 'DRAFT' | 'NEEDS INFO' | 'APPROVED' | 'SUBMITTED' | 'UNDER REVIEW' | 'REJECTED';
   assignedSpecialist?: string | null;
+  onboardedBy?: string;
+  opsResponsible?: string;
 }
 
 export interface DocumentRecord {
@@ -311,26 +315,26 @@ export const initialRoles: RoleDefinition[] = [
 ];
 
 export const initialProviders: ProviderApplication[] = [
-  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
-  { id: 540, name: "Iris Hines", date: "Oct 27, 2026", email: "hinesiris323@gmail.com", phone: "+1 9123468863", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "David Miller" },
-  { id: 539, name: "Prathum", date: "Oct 27, 2026", email: "prathum@mantra.care", phone: "7042955825", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01" },
-  { id: 538, name: "Alcira Osayi", date: "Oct 27, 2026", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", service: "THERAPY", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null },
-  { id: 537, name: "Nick Spinks", date: "Oct 27, 2026", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null },
-  { id: 536, name: "Emily Richards", date: "Oct 27, 2026", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null },
-  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
-  { id: 534, name: "John Zavaiydriga", date: "Oct 26, 2026", email: "jjzavaiydriga@gmail.com", phone: "+1 3187803280", organization: "MantraCare", service: "PHYSIOTHERAPY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
-  { id: 533, name: "Mr Philip Joyce", date: "Oct 26, 2026", email: "phil.joyce13@gmail.com", phone: "+44 07730886536", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null },
-  { id: 532, name: "Jodhi Wood Gaudet", date: "Oct 26, 2026", email: "outofthewoodscounselling@outl...", phone: "+1 5145673557", organization: "MantraCare", service: "THERAPY", country: "Canada", countryFlag: "🇨🇦", status: "SUBMITTED", assignedSpecialist: "David Miller" }
+  { id: 541, name: "Kathleen Diblin", date: "Oct 28, 2026", email: "profslp1929@gmail.com", phone: "+1 6402869150", organization: "MantraCare", service: "SPEECH THERAPIST", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
+  { id: 540, name: "Iris Hines", date: "Oct 27, 2026", email: "hinesiris323@gmail.com", phone: "+1 9123468863", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "David Miller", onboardedBy: "Abhishek Madan", opsResponsible: "David Miller" },
+  { id: 539, name: "Prathum", date: "Oct 27, 2026", email: "prathum@mantra.care", phone: "7042955825", organization: "MantraCare", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01" },
+  { id: 538, name: "Alcira Osayi", date: "Oct 27, 2026", email: "alciraosayi@yahoo.com", phone: "+1 6786222953", organization: "MantraCare", service: "THERAPY", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins" },
+  { id: 537, name: "Nick Spinks", date: "Oct 27, 2026", email: "nick.spinks@outlook.com", phone: "+44 7979545964", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Self (Portal)", opsResponsible: "Alex Chen" },
+  { id: 536, name: "Emily Richards", date: "Oct 27, 2026", email: "drk@lavendervisioncare.com", phone: "5039294442", organization: "Lavender Vision PLLC", service: "OTHERSERVICES", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "David Miller", opsResponsible: "David Miller" },
+  { id: 535, name: "Morgen-Ashlee Backus", date: "Oct 27, 2026", email: "morgenbackusnutrition@gmail....", phone: "+1 8566286679", organization: "MantraCare", service: "DIETITIAN", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
+  { id: 534, name: "John Zavaiydriga", date: "Oct 26, 2026", email: "jjzavaiydriga@gmail.com", phone: "+1 3187803280", organization: "MantraCare", service: "PHYSIOTHERAPY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Ops Intake", opsResponsible: "Sarah Jenkins" },
+  { id: 533, name: "Mr Philip Joyce", date: "Oct 26, 2026", email: "phil.joyce13@gmail.com", phone: "+44 07730886536", organization: "MantraCare", service: "THERAPY", country: "United Kingdom", countryFlag: "🇬🇧", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Abhishek Madan", opsResponsible: "Alex Chen" },
+  { id: 532, name: "Jodhi Wood Gaudet", date: "Oct 26, 2026", email: "outofthewoodscounselling@outl...", phone: "+1 5145673557", organization: "MantraCare", service: "THERAPY", country: "Canada", countryFlag: "🇨🇦", status: "SUBMITTED", assignedSpecialist: "David Miller", onboardedBy: "Self (Portal)", opsResponsible: "David Miller" }
 ];
 
 export const initialFacilities: FacilityApplication[] = [
-  { id: "1", name: "Rachel", type: "GROUP", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01" },
-  { id: "2", name: "Rachel", type: "GROUP", date: "Aug 14, 2026", email: "veni@mantra.care", phone: "123", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "UNDER REVIEW", assignedSpecialist: "David Miller" },
-  { id: "3", name: "Tabula Rasa Inc", type: "GROUP", date: "Aug 22, 2026", email: "IncTabulaRasa@gmail.com", phone: "605-891-4377", organization: "Tabula Rasa Inc", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null },
-  { id: "4", name: "4313046171", type: "FACILITY", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "REJECTED", assignedSpecialist: null },
-  { id: "5", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "David Miller" },
-  { id: "6", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins" },
-  { id: "7", name: "adsfd", type: "FACILITY", date: "Aug 22, 2026", email: "—", phone: "—", organization: "Kanak's clinic", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "SUBMITTED", assignedSpecialist: "Anshul Gupta01" }
+  { id: "1", name: "Rachel", type: "GROUP", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Abhishek Madan", opsResponsible: "Anshul Gupta01" },
+  { id: "2", name: "Rachel", type: "GROUP", date: "Aug 14, 2026", email: "veni@mantra.care", phone: "123", organization: "MantraCare", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "UNDER REVIEW", assignedSpecialist: "David Miller", onboardedBy: "Self (Portal)", opsResponsible: "David Miller" },
+  { id: "3", name: "Tabula Rasa Inc", type: "GROUP", date: "Aug 22, 2026", email: "IncTabulaRasa@gmail.com", phone: "605-891-4377", organization: "Tabula Rasa Inc", service: "GROUP_PROFILE", country: "United States", countryFlag: "🇺🇸", status: "DRAFT", assignedSpecialist: null, onboardedBy: "Sarah Jenkins", opsResponsible: "Sarah Jenkins" },
+  { id: "4", name: "4313046171", type: "FACILITY", date: "Aug 20, 2026", email: "—", phone: "—", organization: "MantraCare", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "REJECTED", assignedSpecialist: null, onboardedBy: "Ops Intake", opsResponsible: "Alex Chen" },
+  { id: "5", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "David Miller", onboardedBy: "David Miller", opsResponsible: "David Miller" },
+  { id: "6", name: "Tabula Rasa Inc", type: "FACILITY", date: "Aug 24, 2026", email: "—", phone: "—", organization: "Tabula Rasa Inc", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "APPROVED", assignedSpecialist: "Sarah Jenkins", onboardedBy: "Self (Portal)", opsResponsible: "Sarah Jenkins" },
+  { id: "7", name: "adsfd", type: "FACILITY", date: "Aug 22, 2026", email: "—", phone: "—", organization: "Kanak's clinic", service: "FACILITY", country: "United States", countryFlag: "🇺🇸", status: "SUBMITTED", assignedSpecialist: "Anshul Gupta01", onboardedBy: "Self (Portal)", opsResponsible: "Anshul Gupta01" }
 ];
 
 export const initialDocuments: DocumentRecord[] = [
