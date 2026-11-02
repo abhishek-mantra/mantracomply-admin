@@ -5,6 +5,9 @@ import {
   Search, 
   Clock, 
   Eye, 
+  EyeOff,
+  GripVertical,
+  RotateCcw,
   ChevronLeft, 
   ChevronRight, 
   ChevronsLeft, 
@@ -12,71 +15,29 @@ import {
   ChevronDown,
   UserCheck,
   ShieldCheck,
-  Menu
+  Settings
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { StatusBadge } from '../components/StatusBadge';
 import { ApplicationDetailModal } from '../components/ApplicationDetailModal';
 import { StatusHistoryModal } from '../components/StatusHistoryModal';
 
-// Hamburger Action Menu Component with 2 Actions: View Details & Status History
-const ActionMenu: React.FC<{
-  isOpen: boolean;
-  onToggle: (e: React.MouseEvent) => void;
-  onViewDetails: () => void;
-  onViewHistory: () => void;
-  isNearBottom?: boolean;
-}> = ({ isOpen, onToggle, onViewDetails, onViewHistory, isNearBottom = false }) => {
-  return (
-    <div className="relative inline-block text-center">
-      <button
-        type="button"
-        onClick={onToggle}
-        className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all cursor-pointer mx-auto ${
-          isOpen
-            ? 'bg-blue-50 border-blue-300 text-blue-600 shadow-xs'
-            : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-100 hover:border-slate-300'
-        }`}
-        title="Actions"
-        aria-label="Actions"
-      >
-        <Menu size={14} />
-      </button>
+export interface ColumnDef {
+  id: string;
+  label: string;
+  visible: boolean;
+  minWidth?: string;
+}
 
-      {isOpen && (
-        <div
-          className={`absolute right-0 w-44 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
-            isNearBottom ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
-          }`}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails();
-            }}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
-          >
-            <Eye size={14} className="text-blue-600" />
-            <span>View Details</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewHistory();
-            }}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-t border-slate-100 cursor-pointer font-semibold"
-          >
-            <Clock size={14} className="text-amber-600" />
-            <span>Status History</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
+const DEFAULT_CREDENTIAL_COLUMNS: ColumnDef[] = [
+  { id: 'email', label: 'Email', visible: true, minWidth: '180px' },
+  { id: 'organization', label: 'Organization', visible: true, minWidth: '140px' },
+  { id: 'service', label: 'Service', visible: true, minWidth: '130px' },
+  { id: 'country', label: 'Country', visible: true, minWidth: '140px' },
+  { id: 'onboardedBy', label: 'Onboarded by', visible: true, minWidth: '160px' },
+  { id: 'opsResponsible', label: 'Ops Responsible', visible: true, minWidth: '180px' },
+  { id: 'status', label: 'Status', visible: true, minWidth: '140px' }
+];
 
 export const CredentialApplications: React.FC = () => {
   const {
@@ -103,7 +64,43 @@ export const CredentialApplications: React.FC = () => {
   const [historyTitle, setHistoryTitle] = useState<string | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
-  // Floating hamburger action menu open state
+  // Column Settings Dialog State (Triggered by ⚙ in table header)
+  const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
+  const [draggedColumnIdx, setDraggedColumnIdx] = useState<number | null>(null);
+  const [columns, setColumns] = useState<ColumnDef[]>(() => {
+    try {
+      const saved = localStorage.getItem('mantra_credential_columns');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return DEFAULT_CREDENTIAL_COLUMNS;
+  });
+
+  const visibleColumns = useMemo(() => columns.filter(c => c.visible), [columns]);
+
+  const toggleColumnVisibility = (id: string) => {
+    setColumns(prev => {
+      const updated = prev.map(c => c.id === id ? { ...c, visible: !c.visible } : c);
+      try { localStorage.setItem('mantra_credential_columns', JSON.stringify(updated)); } catch {}
+      return updated;
+    });
+  };
+
+  const reorderColumns = (fromIdx: number, toIdx: number) => {
+    setColumns(prev => {
+      const list = [...prev];
+      const [moved] = list.splice(fromIdx, 1);
+      list.splice(toIdx, 0, moved);
+      try { localStorage.setItem('mantra_credential_columns', JSON.stringify(list)); } catch {}
+      return list;
+    });
+  };
+
+  const resetColumns = () => {
+    setColumns(DEFAULT_CREDENTIAL_COLUMNS);
+    try { localStorage.removeItem('mantra_credential_columns'); } catch {}
+  };
+
+  // Floating hamburger action menu open state (≡ icon in Col 1)
   const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
 
   // Close hamburger menu on outside click
@@ -174,7 +171,7 @@ export const CredentialApplications: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header matching Enrollment Applications UI */}
+      {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">
@@ -218,7 +215,7 @@ export const CredentialApplications: React.FC = () => {
         </div>
       </div>
 
-      {/* Persona Scope Alert Banner matching Enrollment Applications */}
+      {/* Scope Alert Banner matching Enrollment Applications */}
       {isAssignedOnly ? (
         <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-950 shadow-2xs">
           <div className="flex items-center gap-2 font-medium">
@@ -239,13 +236,13 @@ export const CredentialApplications: React.FC = () => {
               <strong>Admin Access Active:</strong> Reviewing all credentialing applications across the entire organization. Ops team can reassign responsible specialists at any stage.
             </span>
           </div>
-          <span className="font-bold text-[10px] tracking-wide uppercase bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded border border-blue-200">
+          <span className="font-bold text-[10px] tracking-wide uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-200">
             Global View Scope
           </span>
         </div>
       )}
 
-      {/* Search and Filters Bar matching Enrollment Applications */}
+      {/* Search and Filters Bar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
           <Search size={18} className="text-slate-400 shrink-0" />
@@ -296,47 +293,57 @@ export const CredentialApplications: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content Table Container with Deep Navy Header (#002B49) matching Enrollment Applications */}
+      {/* Main Content Table Container matching User's Exact Layout:
+          Col 1: ⚙ in Header, ≡ in Rows (Hamburger Menu Action with View Details & Status History)
+          Col 2: PROVIDER NAME
+          Col 3..N: Dynamic Columns (Email, Org, Service, Country, Onboarded by, Ops Responsible, Status)
+          NO SELECT BOXES
+      */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           {activeSubTab === 'providers' ? (
-            /* Providers Table (No Checkboxes, Added 'Onboarded by' & 'Ops Responsible', Hamburger Menu Action) */
+            /* Providers Table */
             <table className="w-full text-left border-separate border-spacing-0">
               <thead>
                 <tr className="bg-[#002B49] text-white text-[11px] font-bold uppercase tracking-wider">
+                  {/* Col 1: Settings Gear Icon */}
+                  <th className="py-3.5 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-[#1a4a6e] box-border">
+                    <button
+                      type="button"
+                      onClick={() => setIsColumnSettingsOpen(true)}
+                      className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer mx-auto text-slate-200 hover:text-white"
+                      title="Column Settings (Reorder & Toggle Columns)"
+                    >
+                      <Settings size={15} />
+                    </button>
+                  </th>
+
+                  {/* Col 2: Provider Name */}
                   <th className="py-3.5 px-5 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[220px]">
-                    Provider
+                    PROVIDER NAME
                   </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[180px]">
-                    Email
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[140px]">
-                    Organization
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[130px]">
-                    Service
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[140px]">
-                    Country
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[160px]">
-                    Onboarded by
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[180px]">
-                    Ops Responsible
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap text-center min-w-[130px]">
-                    Status
-                  </th>
-                  <th className="py-3.5 px-3 border-b border-[#1a4a6e] text-center w-14 whitespace-nowrap">
-                    Action
-                  </th>
+
+                  {/* Dynamic Columns */}
+                  {visibleColumns.map((col, idx) => {
+                    const isLast = idx === visibleColumns.length - 1;
+                    return (
+                      <th
+                        key={col.id}
+                        className={`py-3.5 px-4 border-b border-[#1a4a6e] whitespace-nowrap ${
+                          !isLast ? 'border-r border-[#1a4a6e]' : ''
+                        } ${col.id === 'status' ? 'text-center' : ''}`}
+                        style={{ minWidth: col.minWidth }}
+                      >
+                        {col.label}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="text-xs">
                 {filteredProviders.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
+                    <td colSpan={visibleColumns.length + 2} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
                       No applications found matching your criteria.
                     </td>
                   </tr>
@@ -345,7 +352,66 @@ export const CredentialApplications: React.FC = () => {
                     const isNearBottom = idx >= filteredProviders.length - 2 && filteredProviders.length > 2;
                     return (
                       <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                        <td className="py-3.5 px-5 border-r border-b border-slate-100">
+                        {/* Col 1: Hamburger Menu Action (≡) */}
+                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative">
+                          <div className="relative inline-block text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === item.id ? null : item.id);
+                              }}
+                              className={`w-7 h-7 rounded-md flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                                openMenuId === item.id
+                                  ? 'bg-blue-100 text-blue-700 font-bold'
+                                  : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
+                              }`}
+                              title="Actions (View Details, Status History)"
+                              aria-label="Actions"
+                            >
+                              <span className="text-base select-none font-bold leading-none">≡</span>
+                            </button>
+
+                            {openMenuId === item.id && (
+                              <div
+                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                  isNearBottom ? 'bottom-0' : 'top-0'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(null);
+                                    setSelectedRecord(item);
+                                    setIsDetailOpen(true);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
+                                >
+                                  <Eye size={14} className="text-blue-600" />
+                                  <span>View Details</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(null);
+                                    setHistoryTitle(`${item.name} (ID: #${item.id})`);
+                                    setIsHistoryOpen(true);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-t border-slate-100 cursor-pointer font-semibold"
+                                >
+                                  <Clock size={14} className="text-amber-600" />
+                                  <span>Status History</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Col 2: Provider Name with ID underneath (Matching Screenshot) */}
+                        <td className="py-3 px-5 border-r border-b border-slate-100">
                           <button
                             type="button"
                             onClick={() => {
@@ -359,77 +425,91 @@ export const CredentialApplications: React.FC = () => {
                               {item.name}
                             </div>
                             <div className="text-[10px] text-slate-400 mt-0.5 font-normal">
-                              ID: #{item.id} • {item.date}
+                              ID: #{item.id}
                             </div>
                           </button>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600 font-medium whitespace-nowrap border-r border-b border-slate-100">
-                          {item.email}
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-700 font-medium whitespace-nowrap border-r border-b border-slate-100">
-                          {item.organization}
-                        </td>
-                        <td className="py-3.5 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap border-r border-b border-slate-100">
-                          {item.service}
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-700 whitespace-nowrap border-r border-b border-slate-100">
-                          <span className="mr-1.5">{item.countryFlag}</span>
-                          {item.country}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap border-r border-b border-slate-100">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-                            <UserCheck size={12} className="text-slate-400 shrink-0" />
-                            <span>{item.onboardedBy || 'Self (Portal)'}</span>
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap border-r border-b border-slate-100">
-                          {canManageAssignments ? (
-                            <div className="relative inline-block text-left">
-                              <select
-                                value={item.opsResponsible || item.assignedSpecialist || availableSpecialists[0]}
-                                onChange={(e) => assignProviderSpecialist(item.id, e.target.value)}
-                                className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              >
-                                {availableSpecialists.map((specialist) => (
-                                  <option key={specialist} value={specialist}>
-                                    {specialist}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
-                            </div>
-                          ) : (
-                            <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
-                              {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center whitespace-nowrap border-r border-b border-slate-100">
-                          <StatusBadge
-                            status={item.status}
-                            interactive={true}
-                            options={['DRAFT', 'NEEDS INFO', 'APPROVED', 'SUBMITTED', 'UNDER REVIEW', 'REJECTED']}
-                            onChange={(s) => updateProviderStatus(item.id, s)}
-                          />
-                        </td>
-                        <td className="py-3.5 px-3 text-center border-b border-slate-100">
-                          <ActionMenu
-                            isOpen={openMenuId === item.id}
-                            onToggle={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(openMenuId === item.id ? null : item.id);
-                            }}
-                            onViewDetails={() => {
-                              setSelectedRecord(item);
-                              setIsDetailOpen(true);
-                            }}
-                            onViewHistory={() => {
-                              setHistoryTitle(`${item.name} (ID: #${item.id})`);
-                              setIsHistoryOpen(true);
-                            }}
-                            isNearBottom={isNearBottom}
-                          />
-                        </td>
+
+                        {/* Dynamic Visible Columns */}
+                        {visibleColumns.map((col, cIdx) => {
+                          const isLast = cIdx === visibleColumns.length - 1;
+                          const borderClass = isLast ? 'border-b border-slate-100' : 'border-r border-b border-slate-100';
+
+                          switch (col.id) {
+                            case 'email':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-600 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.email}
+                                </td>
+                              );
+                            case 'organization':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.organization}
+                                </td>
+                              );
+                            case 'service':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap ${borderClass}`}>
+                                  {item.service}
+                                </td>
+                              );
+                            case 'country':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${borderClass}`}>
+                                  <span className="mr-1.5">{item.countryFlag}</span>
+                                  {item.country}
+                                </td>
+                              );
+                            case 'onboardedBy':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
+                                    <UserCheck size={12} className="text-slate-400 shrink-0" />
+                                    <span>{item.onboardedBy || 'Self (Portal)'}</span>
+                                  </span>
+                                </td>
+                              );
+                            case 'opsResponsible':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  {canManageAssignments ? (
+                                    <div className="relative inline-block text-left">
+                                      <select
+                                        value={item.opsResponsible || item.assignedSpecialist || availableSpecialists[0]}
+                                        onChange={(e) => assignProviderSpecialist(item.id, e.target.value)}
+                                        className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                      >
+                                        {availableSpecialists.map((specialist) => (
+                                          <option key={specialist} value={specialist}>
+                                            {specialist}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                    </div>
+                                  ) : (
+                                    <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
+                                      {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            case 'status':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-center whitespace-nowrap ${borderClass}`}>
+                                  <StatusBadge
+                                    status={item.status}
+                                    interactive={true}
+                                    options={['DRAFT', 'NEEDS INFO', 'APPROVED', 'SUBMITTED', 'UNDER REVIEW', 'REJECTED']}
+                                    onChange={(s) => updateProviderStatus(item.id, s)}
+                                  />
+                                </td>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
                       </tr>
                     );
                   })
@@ -437,43 +517,48 @@ export const CredentialApplications: React.FC = () => {
               </tbody>
             </table>
           ) : (
-            /* Groups / Facilities Table (No Checkboxes, Added 'Onboarded by' & 'Ops Responsible', Hamburger Menu Action) */
+            /* Groups / Facilities Table */
             <table className="w-full text-left border-separate border-spacing-0">
               <thead>
                 <tr className="bg-[#002B49] text-white text-[11px] font-bold uppercase tracking-wider">
+                  {/* Col 1: Settings Gear Icon */}
+                  <th className="py-3.5 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-[#1a4a6e] box-border">
+                    <button
+                      type="button"
+                      onClick={() => setIsColumnSettingsOpen(true)}
+                      className="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center transition-colors cursor-pointer mx-auto text-slate-200 hover:text-white"
+                      title="Column Settings (Reorder & Toggle Columns)"
+                    >
+                      <Settings size={15} />
+                    </button>
+                  </th>
+
+                  {/* Col 2: Facility / Group Name */}
                   <th className="py-3.5 px-5 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[220px]">
-                    Facility / Group
+                    FACILITY / GROUP
                   </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[180px]">
-                    Email
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[140px]">
-                    Organization
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[130px]">
-                    Service
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[140px]">
-                    Country
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[160px]">
-                    Onboarded by
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap min-w-[180px]">
-                    Ops Responsible
-                  </th>
-                  <th className="py-3.5 px-4 border-r border-b border-[#1a4a6e] whitespace-nowrap text-center min-w-[130px]">
-                    Status
-                  </th>
-                  <th className="py-3.5 px-3 border-b border-[#1a4a6e] text-center w-14 whitespace-nowrap">
-                    Action
-                  </th>
+
+                  {/* Dynamic Columns */}
+                  {visibleColumns.map((col, idx) => {
+                    const isLast = idx === visibleColumns.length - 1;
+                    return (
+                      <th
+                        key={col.id}
+                        className={`py-3.5 px-4 border-b border-[#1a4a6e] whitespace-nowrap ${
+                          !isLast ? 'border-r border-[#1a4a6e]' : ''
+                        } ${col.id === 'status' ? 'text-center' : ''}`}
+                        style={{ minWidth: col.minWidth }}
+                      >
+                        {col.label}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="text-xs">
                 {filteredFacilities.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
+                    <td colSpan={visibleColumns.length + 2} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
                       No facilities found matching your criteria.
                     </td>
                   </tr>
@@ -482,7 +567,66 @@ export const CredentialApplications: React.FC = () => {
                     const isNearBottom = idx >= filteredFacilities.length - 2 && filteredFacilities.length > 2;
                     return (
                       <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                        <td className="py-3.5 px-5 border-r border-b border-slate-100">
+                        {/* Col 1: Hamburger Menu Action (≡) */}
+                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border relative">
+                          <div className="relative inline-block text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === item.id ? null : item.id);
+                              }}
+                              className={`w-7 h-7 rounded-md flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                                openMenuId === item.id
+                                  ? 'bg-blue-100 text-blue-700 font-bold'
+                                  : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
+                              }`}
+                              title="Actions (View Details, Status History)"
+                              aria-label="Actions"
+                            >
+                              <span className="text-base select-none font-bold leading-none">≡</span>
+                            </button>
+
+                            {openMenuId === item.id && (
+                              <div
+                                className={`absolute left-full ml-1 w-44 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                  isNearBottom ? 'bottom-0' : 'top-0'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(null);
+                                    setSelectedRecord(item);
+                                    setIsDetailOpen(true);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
+                                >
+                                  <Eye size={14} className="text-blue-600" />
+                                  <span>View Details</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(null);
+                                    setHistoryTitle(`${item.name} (${item.type})`);
+                                    setIsHistoryOpen(true);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-t border-slate-100 cursor-pointer font-semibold"
+                                >
+                                  <Clock size={14} className="text-amber-600" />
+                                  <span>Status History</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Col 2: Facility Name */}
+                        <td className="py-3 px-5 border-r border-b border-slate-100">
                           <button
                             type="button"
                             onClick={() => {
@@ -499,77 +643,91 @@ export const CredentialApplications: React.FC = () => {
                               <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded tracking-wider">
                                 {item.type}
                               </span>
-                              <span className="text-[10px] text-slate-400 font-normal">ID: #{item.id} • {item.date}</span>
+                              <span className="text-[10px] text-slate-400 font-normal">ID: #{item.id}</span>
                             </div>
                           </button>
                         </td>
-                        <td className="py-3.5 px-4 text-slate-600 font-medium whitespace-nowrap border-r border-b border-slate-100">
-                          {item.email}
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-700 font-medium whitespace-nowrap border-r border-b border-slate-100">
-                          {item.organization}
-                        </td>
-                        <td className="py-3.5 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap border-r border-b border-slate-100">
-                          {item.service}
-                        </td>
-                        <td className="py-3.5 px-4 text-slate-700 whitespace-nowrap border-r border-b border-slate-100">
-                          <span className="mr-1.5">{item.countryFlag}</span>
-                          {item.country}
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap border-r border-b border-slate-100">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-                            <UserCheck size={12} className="text-slate-400 shrink-0" />
-                            <span>{item.onboardedBy || 'Self (Portal)'}</span>
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-4 whitespace-nowrap border-r border-b border-slate-100">
-                          {canManageAssignments ? (
-                            <div className="relative inline-block text-left">
-                              <select
-                                value={item.opsResponsible || item.assignedSpecialist || availableSpecialists[0]}
-                                onChange={(e) => assignFacilitySpecialist(item.id, e.target.value)}
-                                className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                              >
-                                {availableSpecialists.map((specialist) => (
-                                  <option key={specialist} value={specialist}>
-                                    {specialist}
-                                  </option>
-                                ))}
-                              </select>
-                              <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
-                            </div>
-                          ) : (
-                            <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
-                              {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3.5 px-4 text-center whitespace-nowrap border-r border-b border-slate-100">
-                          <StatusBadge
-                            status={item.status}
-                            interactive={true}
-                            options={['DRAFT', 'UNDER REVIEW', 'APPROVED', 'SUBMITTED', 'REJECTED', 'NEEDS INFO']}
-                            onChange={(s) => updateFacilityStatus(item.id, s)}
-                          />
-                        </td>
-                        <td className="py-3.5 px-3 text-center border-b border-slate-100">
-                          <ActionMenu
-                            isOpen={openMenuId === item.id}
-                            onToggle={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(openMenuId === item.id ? null : item.id);
-                            }}
-                            onViewDetails={() => {
-                              setSelectedRecord(item);
-                              setIsDetailOpen(true);
-                            }}
-                            onViewHistory={() => {
-                              setHistoryTitle(`${item.name} (${item.type})`);
-                              setIsHistoryOpen(true);
-                            }}
-                            isNearBottom={isNearBottom}
-                          />
-                        </td>
+
+                        {/* Dynamic Visible Columns */}
+                        {visibleColumns.map((col, cIdx) => {
+                          const isLast = cIdx === visibleColumns.length - 1;
+                          const borderClass = isLast ? 'border-b border-slate-100' : 'border-r border-b border-slate-100';
+
+                          switch (col.id) {
+                            case 'email':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-600 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.email}
+                                </td>
+                              );
+                            case 'organization':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-700 font-medium whitespace-nowrap ${borderClass}`}>
+                                  {item.organization}
+                                </td>
+                              );
+                            case 'service':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-blue-700 font-semibold uppercase tracking-tight whitespace-nowrap ${borderClass}`}>
+                                  {item.service}
+                                </td>
+                              );
+                            case 'country':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${borderClass}`}>
+                                  <span className="mr-1.5">{item.countryFlag}</span>
+                                  {item.country}
+                                </td>
+                              );
+                            case 'onboardedBy':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
+                                    <UserCheck size={12} className="text-slate-400 shrink-0" />
+                                    <span>{item.onboardedBy || 'Self (Portal)'}</span>
+                                  </span>
+                                </td>
+                              );
+                            case 'opsResponsible':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
+                                  {canManageAssignments ? (
+                                    <div className="relative inline-block text-left">
+                                      <select
+                                        value={item.opsResponsible || item.assignedSpecialist || availableSpecialists[0]}
+                                        onChange={(e) => assignFacilitySpecialist(item.id, e.target.value)}
+                                        className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                      >
+                                        {availableSpecialists.map((specialist) => (
+                                          <option key={specialist} value={specialist}>
+                                            {specialist}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                    </div>
+                                  ) : (
+                                    <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs">
+                                      {item.opsResponsible || item.assignedSpecialist || 'Unassigned'}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            case 'status':
+                              return (
+                                <td key={col.id} className={`py-3 px-4 text-center whitespace-nowrap ${borderClass}`}>
+                                  <StatusBadge
+                                    status={item.status}
+                                    interactive={true}
+                                    options={['DRAFT', 'UNDER REVIEW', 'APPROVED', 'SUBMITTED', 'REJECTED', 'NEEDS INFO']}
+                                    onChange={(s) => updateFacilityStatus(item.id, s)}
+                                  />
+                                </td>
+                              );
+                            default:
+                              return null;
+                          }
+                        })}
                       </tr>
                     );
                   })
@@ -641,6 +799,86 @@ export const CredentialApplications: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Column Settings Modal (⚙ in header) */}
+      {isColumnSettingsOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div 
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity" 
+              onClick={() => setIsColumnSettingsOpen(false)} 
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 transform transition-all z-10 border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+              <div className="mb-4">
+                <h3 className="text-base font-bold text-slate-900">Column Settings</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Drag to reorder columns or toggle their visibility.
+                </p>
+              </div>
+
+              <div className="space-y-1.5 max-h-[360px] overflow-y-auto py-1">
+                {columns.map((col, idx) => (
+                  <div
+                    key={col.id}
+                    draggable
+                    onDragStart={() => setDraggedColumnIdx(idx)}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={() => {
+                      if (draggedColumnIdx !== null && draggedColumnIdx !== idx) {
+                        reorderColumns(draggedColumnIdx, idx);
+                      }
+                      setDraggedColumnIdx(null);
+                    }}
+                    className={`flex items-center justify-between p-2 rounded-xl border text-xs font-semibold transition-all ${
+                      col.visible
+                        ? 'bg-slate-50/80 border-slate-200 text-slate-800 hover:bg-slate-100/80'
+                        : 'bg-white border-dashed border-slate-200 text-slate-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <GripVertical size={14} className="text-slate-400 cursor-grab shrink-0" />
+                      <span>{col.label}</span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleColumnVisibility(col.id)}
+                      className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                        col.visible 
+                          ? 'text-blue-600 hover:bg-blue-50' 
+                          : 'text-slate-400 hover:bg-slate-100'
+                      }`}
+                      title={col.visible ? 'Hide column' : 'Show column'}
+                    >
+                      {col.visible ? <Eye size={15} /> : <EyeOff size={15} />}
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={resetColumns}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                >
+                  <RotateCcw size={13} />
+                  <span>Reset Default</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsColumnSettingsOpen(false)}
+                  className="px-5 py-2 rounded-xl bg-[#1c2d42] hover:bg-[#002B49] text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Detail Modal */}
       <ApplicationDetailModal
