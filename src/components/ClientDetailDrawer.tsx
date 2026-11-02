@@ -969,9 +969,6 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                   <thead>
                     <tr className="bg-[#002B49] text-white text-[10px] font-bold uppercase tracking-wider">
                       <th className="py-3 px-3 w-8 text-center border-r border-[#1a4a6e]">
-                        <input type="checkbox" className="rounded" />
-                      </th>
-                      <th className="py-3 px-3 w-8 text-center border-r border-[#1a4a6e]">
                         ⚙
                       </th>
                       <th className="py-3 px-4 border-r border-[#1a4a6e]">
@@ -993,9 +990,6 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs">
                     <tr className="hover:bg-slate-50/80 transition-colors">
-                      <td className="py-3 px-3 text-center">
-                        <input type="checkbox" className="rounded text-blue-600" />
-                      </td>
                       <td className="py-3 px-3 text-center text-slate-400">
                         ≡
                       </td>

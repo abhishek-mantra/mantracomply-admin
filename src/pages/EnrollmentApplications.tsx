@@ -410,22 +410,15 @@ export const EnrollmentApplications: React.FC = () => {
           <table className="w-full text-left border-separate border-spacing-0 min-w-[2100px]">
             <colgroup>
               <col style={{ width: '44px', minWidth: '44px', maxWidth: '44px' }} />
-              <col style={{ width: '40px', minWidth: '40px', maxWidth: '40px' }} />
               {visibleColumns.map((col, idx) => (
                 <col key={col.id} style={{ minWidth: col.minWidth, width: idx === 0 ? '220px' : undefined }} />
               ))}
             </colgroup>
             <thead>
               <tr className="bg-[#002B49] text-white text-[11px] font-bold uppercase tracking-wider">
-                {/* Checkbox Column */}
+                {/* Column Settings Gear Icon */}
                 <th className="py-3.5 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center sticky left-0 bg-[#002B49] z-30 border-r border-b border-[#1a4a6e] box-border">
                   <div className="w-[44px] flex items-center justify-center">
-                    <input type="checkbox" className="rounded cursor-pointer" />
-                  </div>
-                </th>
-                {/* Column Settings Gear Icon */}
-                <th className="py-3.5 px-0 w-[40px] min-w-[40px] max-w-[40px] text-center sticky left-[44px] bg-[#002B49] z-30 border-r border-b border-[#1a4a6e] box-border">
-                  <div className="w-[40px] flex items-center justify-center">
                     <button
                       type="button"
                       onClick={() => setIsColumnSettingsOpen(true)}
@@ -441,7 +434,7 @@ export const EnrollmentApplications: React.FC = () => {
                   <th
                     key={col.id}
                     className={`py-3.5 px-4 whitespace-nowrap border-r border-b border-[#1a4a6e] box-border ${
-                      idx === 0 ? 'sticky left-[84px] bg-[#002B49] z-30 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.25)]' : ''
+                      idx === 0 ? 'sticky left-[44px] bg-[#002B49] z-30 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.25)]' : ''
                     }`}
                     style={{ minWidth: col.minWidth }}
                   >
@@ -453,7 +446,7 @@ export const EnrollmentApplications: React.FC = () => {
             <tbody className="text-xs">
               {filteredEnrollments.length === 0 ? (
                 <tr>
-                  <td colSpan={visibleColumns.length + 2} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
+                  <td colSpan={visibleColumns.length + 1} className="text-center py-16 text-slate-400 text-sm border-b border-slate-100">
                     {isSpecialist 
                       ? `No enrollment requests currently assigned to ${currentPersona.name}.`
                       : `No enrollment requests found matching your filters.`}
@@ -462,14 +455,9 @@ export const EnrollmentApplications: React.FC = () => {
               ) : (
                 filteredEnrollments.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 transition-colors group">
-                    {/* Row Checkbox & Drag / Menu Icon */}
-                    <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 border-r border-b border-slate-100 box-border">
+                    {/* Drag / Menu Icon */}
+                    <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center text-slate-400 sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 border-r border-b border-slate-100 box-border select-none">
                       <div className="w-[44px] flex items-center justify-center">
-                        <input type="checkbox" className="rounded text-blue-600 cursor-pointer" />
-                      </div>
-                    </td>
-                    <td className="py-3 px-0 w-[40px] min-w-[40px] max-w-[40px] text-center text-slate-400 sticky left-[44px] bg-white group-hover:bg-slate-50 transition-colors z-20 border-r border-b border-slate-100 box-border select-none">
-                      <div className="w-[40px] flex items-center justify-center">
                         <span>≡</span>
                       </div>
                     </td>
@@ -478,7 +466,7 @@ export const EnrollmentApplications: React.FC = () => {
                     {visibleColumns.map((col, idx) => {
                       const isFirst = idx === 0;
                       const stickyClass = isFirst 
-                        ? 'sticky left-[84px] bg-white group-hover:bg-slate-50 transition-colors z-20 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.06)] border-r border-b border-slate-100 box-border'
+                        ? 'sticky left-[44px] bg-white group-hover:bg-slate-50 transition-colors z-20 shadow-[4px_0_6px_-1px_rgba(0,0,0,0.06)] border-r border-b border-slate-100 box-border'
                         : 'border-r border-b border-slate-100 box-border';
 
                       switch (col.id) {
