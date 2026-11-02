@@ -137,23 +137,27 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateUser = (userId: number, updates: Partial<UserRecord>) => {
-    setUsers(prev => prev.map(u => {
-      if (u.id === userId) {
-        const updated = { ...u, ...updates };
-        if (updates.organizations && updates.organizations.length > 0 && !updates.organization) {
-          updated.organization = updates.organizations[0];
+    setUsers(prev => {
+      const nextUsers = prev.map(u => {
+        if (u.id === userId) {
+          const updated = { ...u, ...updates };
+          if (updates.organizations && updates.organizations.length > 0 && !updates.organization) {
+            updated.organization = updates.organizations[0];
+          }
+          return updated;
         }
-        return updated;
-      }
-      return u;
-    }));
+        return u;
+      });
 
-    if (updates.role) {
-      setRoles(prev => prev.map(r => {
-        const count = users.filter(u => (u.id === userId ? updates.role : u.role) === r.name).length;
-        return { ...r, userCount: count };
-      }));
-    }
+      if (updates.role) {
+        setRoles(prevRoles => prevRoles.map(r => {
+          const count = nextUsers.filter(u => u.role === r.name).length;
+          return { ...r, userCount: count };
+        }));
+      }
+
+      return nextUsers;
+    });
   };
 
   const assignUserSpecialist = (userId: number, specialist: string) => {
@@ -169,13 +173,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const updateUserRole = (userId: number, newRole: RoleType) => {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
-    
-    // Update role user counts
-    setRoles(prev => prev.map(r => {
-      const count = users.filter(u => (u.id === userId ? newRole : u.role) === r.name).length;
-      return { ...r, userCount: count };
-    }));
+    updateUser(userId, { role: newRole });
   };
 
   const updateProviderStatus = (id: number, status: StatusType) => {

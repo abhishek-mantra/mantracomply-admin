@@ -14,7 +14,6 @@ import {
   ChevronsRight,
   ChevronDown,
   UserCheck,
-  ShieldCheck,
   Settings
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -217,33 +216,6 @@ export const CredentialApplications: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Scope Alert Banner matching Enrollment Applications */}
-      {isAssignedOnly ? (
-        <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-center justify-between text-xs text-emerald-950 shadow-2xs">
-          <div className="flex items-center gap-2 font-medium">
-            <UserCheck size={16} className="text-emerald-600 shrink-0" />
-            <span>
-              <strong>Specialist Workload Mode:</strong> You are viewing as <strong>{currentPersona.name}</strong> ({currentPersona.role}). Showing strictly only applications assigned to you.
-            </span>
-          </div>
-          <span className="font-bold text-[10px] tracking-wide uppercase bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded border border-emerald-300">
-            Assigned Only Scope
-          </span>
-        </div>
-      ) : (
-        <div className="p-3 bg-blue-50/80 border border-blue-200 rounded-xl flex items-center justify-between text-xs text-blue-900 shadow-2xs">
-          <div className="flex items-center gap-2 font-medium">
-            <ShieldCheck size={16} className="text-blue-600 shrink-0" />
-            <span>
-              <strong>Admin Access Active:</strong> Reviewing all credentialing applications across the entire organization. Ops team can reassign responsible specialists at any stage.
-            </span>
-          </div>
-          <span className="font-bold text-[10px] tracking-wide uppercase bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-200">
-            Global View Scope
-          </span>
-        </div>
-      )}
 
       {/* Search and Filters Bar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">

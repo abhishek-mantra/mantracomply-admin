@@ -187,13 +187,18 @@ export const UsersManagement: React.FC = () => {
   // Close popovers on outside click
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
-      if (orgFilterRef.current && !orgFilterRef.current.contains(e.target as Node)) {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      if (orgFilterRef.current && !orgFilterRef.current.contains(target)) {
         setIsOrgFilterOpen(false);
       }
-      if (userOrgPopoverRef.current && !userOrgPopoverRef.current.contains(e.target as Node)) {
+      if (userOrgPopoverRef.current && !userOrgPopoverRef.current.contains(target)) {
         setEditingUserOrgsId(null);
       }
-      setOpenMenuUserId(null);
+      if (!target.closest('.user-action-menu-container')) {
+        setOpenMenuUserId(null);
+      }
     };
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
@@ -675,7 +680,7 @@ export const UsersManagement: React.FC = () => {
                         <td className={`py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border sticky left-0 bg-white group-hover:bg-slate-50 transition-colors relative ${
                           openMenuUserId === user.id ? 'z-50' : 'z-20'
                         }`}>
-                          <div className={`relative inline-block text-center ${openMenuUserId === user.id ? 'z-50' : ''}`}>
+                          <div className={`relative inline-block text-center user-action-menu-container ${openMenuUserId === user.id ? 'z-50' : ''}`}>
                             <button
                               type="button"
                               onClick={(e) => {
@@ -687,8 +692,8 @@ export const UsersManagement: React.FC = () => {
                                   ? 'bg-blue-100 text-blue-700 font-bold'
                                   : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
                               }`}
-                              title="User Actions (Edit Role & Details)"
-                              aria-label="User Actions"
+                              title="Edit User"
+                              aria-label="Edit User"
                             >
                               <span className="text-base select-none font-bold leading-none">≡</span>
                             </button>
@@ -696,29 +701,20 @@ export const UsersManagement: React.FC = () => {
                             {openMenuUserId === user.id && (
                               <div
                                 onClick={(e) => e.stopPropagation()}
-                                className={`absolute left-full ml-1 w-52 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-[100] text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                className={`absolute left-full ml-1 w-32 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-[100] text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
                                   isNearBottom ? 'bottom-0' : 'top-0'
                                 }`}
                               >
                                 <button
                                   type="button"
-                                  onClick={() => handleOpenEditUser(user)}
-                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
-                                >
-                                  <Edit3 size={14} className="text-blue-600" />
-                                  <span>Edit Role & Details</span>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setEditingUserOrgsId(user.id);
-                                    setOpenMenuUserId(null);
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenEditUser(user);
                                   }}
-                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-t border-slate-100 cursor-pointer font-semibold"
+                                  className="w-full flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
                                 >
-                                  <Building2 size={14} className="text-indigo-600" />
-                                  <span>Manage Organizations</span>
+                                  <Edit3 size={14} className="text-blue-600 shrink-0" />
+                                  <span>Edit</span>
                                 </button>
                               </div>
                             )}
@@ -891,10 +887,15 @@ export const UsersManagement: React.FC = () => {
                             case 'role':
                               return (
                                 <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-tight">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenEditUser(user)}
+                                    title="Click to edit role & details"
+                                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors uppercase tracking-tight cursor-pointer"
+                                  >
                                     <UserIcon size={11} className="text-blue-500" />
                                     <span>{user.role}</span>
-                                  </span>
+                                  </button>
                                 </td>
                               );
                             default:
@@ -1162,11 +1163,14 @@ export const UsersManagement: React.FC = () => {
                         onChange={(e) => setEditRole(e.target.value as any)}
                         className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer appearance-none pr-8 font-semibold text-blue-700"
                       >
-                        <option value="PROVIDER">Provider</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="CREDENTIALING_SPECIALIST">Credentialing Specialist</option>
-                        <option value="ORG ADMIN">Org Admin</option>
-                        <option value="SUPER_ADMIN">Super Admin</option>
+                        {roles.map((r) => (
+                          <option key={r.id || r.name} value={r.name}>
+                            {r.name}
+                          </option>
+                        ))}
+                        {!roles.some((r) => r.name === editRole) && (
+                          <option value={editRole}>{editRole}</option>
+                        )}
                       </select>
                       <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
                     </div>
@@ -1236,7 +1240,7 @@ export const UsersManagement: React.FC = () => {
                     </label>
                     <select
                       value={editCountry}
-                      onChange={(e) => setNewUserCountry(e.target.value)}
+                      onChange={(e) => setEditCountry(e.target.value)}
                       className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer"
                     >
                       <option value="United States">🇺🇸 United States</option>
