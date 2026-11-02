@@ -37,7 +37,6 @@ const DEFAULT_CREDENTIAL_COLUMNS: ColumnDef[] = [
   { id: 'onboardedBy', label: 'Onboarded by', visible: true, minWidth: '160px' },
   { id: 'opsResponsible', label: 'Ops Responsible', visible: true, minWidth: '180px' },
   { id: 'credentialingStartDate', label: 'Credentialing start date', visible: true, minWidth: '160px' },
-  { id: 'enrollmentStartDate', label: 'Enrollment start date', visible: true, minWidth: '160px' },
   { id: 'status', label: 'Status', visible: true, minWidth: '140px' }
 ];
 
@@ -72,7 +71,10 @@ export const CredentialApplications: React.FC = () => {
   const [columns, setColumns] = useState<ColumnDef[]>(() => {
     try {
       const saved = localStorage.getItem('mantra_credential_columns');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.filter((c: ColumnDef) => c.id !== 'enrollmentStartDate');
+      }
     } catch {}
     return DEFAULT_CREDENTIAL_COLUMNS;
   });
@@ -495,20 +497,6 @@ export const CredentialApplications: React.FC = () => {
                                   {item.credentialingStartDate || item.date || '—'}
                                 </td>
                               );
-                            case 'enrollmentStartDate':
-                              return (
-                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  {item.enrollmentStartDate && item.enrollmentStartDate !== 'Pending' && item.enrollmentStartDate !== '—' ? (
-                                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-xs">
-                                      {item.enrollmentStartDate}
-                                    </span>
-                                  ) : (
-                                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px] font-semibold">
-                                      {item.enrollmentStartDate || 'Pending'}
-                                    </span>
-                                  )}
-                                </td>
-                              );
                             case 'status':
                               return (
                                 <td key={col.id} className={`py-3 px-4 text-center whitespace-nowrap ${borderClass}`}>
@@ -750,20 +738,6 @@ export const CredentialApplications: React.FC = () => {
                               return (
                                 <td key={col.id} className={`py-3 px-4 text-slate-600 font-medium whitespace-nowrap ${borderClass}`}>
                                   {item.credentialingStartDate || item.date || '—'}
-                                </td>
-                              );
-                            case 'enrollmentStartDate':
-                              return (
-                                <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  {item.enrollmentStartDate && item.enrollmentStartDate !== 'Pending' && item.enrollmentStartDate !== '—' ? (
-                                    <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-xs">
-                                      {item.enrollmentStartDate}
-                                    </span>
-                                  ) : (
-                                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 text-[11px] font-semibold">
-                                      {item.enrollmentStartDate || 'Pending'}
-                                    </span>
-                                  )}
                                 </td>
                               );
                             case 'status':
