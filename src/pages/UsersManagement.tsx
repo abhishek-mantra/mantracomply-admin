@@ -16,10 +16,11 @@ import {
   User as UserIcon,
   UserCheck,
   GripVertical,
-  Shield
+  Shield,
+  Edit3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { RoleDefinition, RoleType, availableSpecialists, availableOrganizations } from '../data/mockData';
+import { RoleDefinition, RoleType, availableSpecialists, availableOrganizations, UserRecord } from '../data/mockData';
 
 const complianceModules = [
   "Credential Applications",
@@ -62,6 +63,7 @@ export const UsersManagement: React.FC = () => {
     createRole, 
     updateRole,
     addUser,
+    updateUser,
     assignUserSpecialist,
     updateUserOrganizations
   } = useApp();
@@ -80,6 +82,71 @@ export const UsersManagement: React.FC = () => {
   // Quick inline org edit dropdown state for a user
   const [editingUserOrgsId, setEditingUserOrgsId] = useState<number | null>(null);
   const userOrgPopoverRef = useRef<HTMLDivElement>(null);
+
+  // Hamburger Action Menu state
+  const [openMenuUserId, setOpenMenuUserId] = useState<number | null>(null);
+
+  // Edit User Modal State
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editRole, setEditRole] = useState<RoleType>('PROVIDER');
+  const [editStatus, setEditStatus] = useState<'Active' | 'Inactive' | 'Suspended'>('Active');
+  const [editCountry, setEditCountry] = useState('United States');
+  const [editService, setEditService] = useState('THERAPY');
+  const [editOrgs, setEditOrgs] = useState<string[]>(['MantraCare']);
+  const [editReferredBy, setEditReferredBy] = useState('');
+  const [editOnboardedBy, setEditOnboardedBy] = useState('');
+  const [editOpsResponsible, setEditOpsResponsible] = useState('Sarah Jenkins');
+  const [editCredStartDate, setEditCredStartDate] = useState('');
+  const [editEnrollStartDate, setEditEnrollStartDate] = useState('');
+
+  const handleOpenEditUser = (user: UserRecord) => {
+    setEditingUser(user);
+    setEditName(user.name);
+    setEditEmail(user.email);
+    setEditPhone(user.phone || '');
+    setEditRole(user.role);
+    setEditStatus(user.status || 'Active');
+    setEditCountry(user.country || 'United States');
+    setEditService(user.service || 'THERAPY');
+    setEditOrgs(user.organizations && user.organizations.length > 0 ? [...user.organizations] : [user.organization || 'MantraCare']);
+    setEditReferredBy(user.referredBy || 'Portal (Direct)');
+    setEditOnboardedBy(user.onboardedBy || 'Sarah Jenkins');
+    setEditOpsResponsible(user.opsResponsible || availableSpecialists[0]);
+    setEditCredStartDate(user.credentialingStartDate || 'Oct 29, 2026');
+    setEditEnrollStartDate(user.enrollmentStartDate || 'Pending');
+    setOpenMenuUserId(null);
+    setIsEditUserModalOpen(true);
+  };
+
+  const handleSaveEditUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser || !editName.trim() || !editEmail.trim()) return;
+
+    updateUser(editingUser.id, {
+      name: editName.trim(),
+      email: editEmail.trim(),
+      phone: editPhone.trim(),
+      role: editRole,
+      status: editStatus,
+      country: editCountry,
+      countryFlag: editCountry === 'Canada' ? '🇨🇦' : editCountry === 'United Kingdom' ? '🇬🇧' : '🇺🇸',
+      service: editService.trim(),
+      organization: editOrgs[0] || 'MantraCare',
+      organizations: editOrgs.length > 0 ? editOrgs : ['MantraCare'],
+      referredBy: editReferredBy.trim(),
+      onboardedBy: editOnboardedBy.trim(),
+      opsResponsible: editOpsResponsible,
+      credentialingStartDate: editCredStartDate.trim(),
+      enrollmentStartDate: editEnrollStartDate.trim()
+    });
+
+    setIsEditUserModalOpen(false);
+    setEditingUser(null);
+  };
 
   // Column Settings Dialog State
   const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
@@ -126,6 +193,7 @@ export const UsersManagement: React.FC = () => {
       if (userOrgPopoverRef.current && !userOrgPopoverRef.current.contains(e.target as Node)) {
         setEditingUserOrgsId(null);
       }
+      setOpenMenuUserId(null);
     };
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
@@ -595,16 +663,64 @@ export const UsersManagement: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredUsers.map((user) => {
+                  filteredUsers.map((user, idx) => {
+                    const isNearBottom = idx >= filteredUsers.length - 2 && filteredUsers.length > 2;
                     const userOrgs = user.organizations && user.organizations.length > 0 
                       ? user.organizations 
                       : [user.organization];
 
                     return (
                       <tr key={user.id} className="hover:bg-slate-50/80 transition-colors group">
-                        {/* Col 1: Action Hamburger (≡) */}
-                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20">
-                          <span className="text-slate-400 font-bold select-none text-base">≡</span>
+                        {/* Col 1: Action Hamburger (≡) with Edit Option */}
+                        <td className="py-3 px-0 w-[44px] min-w-[44px] max-w-[44px] text-center border-r border-b border-slate-100 box-border sticky left-0 bg-white group-hover:bg-slate-50 transition-colors z-20 relative">
+                          <div className="relative inline-block text-center">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuUserId(openMenuUserId === user.id ? null : user.id);
+                              }}
+                              className={`w-7 h-7 rounded-md flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                                openMenuUserId === user.id
+                                  ? 'bg-blue-100 text-blue-700 font-bold'
+                                  : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'
+                              }`}
+                              title="User Actions (Edit Role & Details)"
+                              aria-label="User Actions"
+                            >
+                              <span className="text-base select-none font-bold leading-none">≡</span>
+                            </button>
+
+                            {openMenuUserId === user.id && (
+                              <div
+                                onClick={(e) => e.stopPropagation()}
+                                className={`absolute left-full ml-1 w-52 rounded-xl bg-white border border-slate-200 shadow-2xl py-1.5 z-50 text-left font-medium text-xs tracking-wide animate-in fade-in zoom-in-95 duration-100 ${
+                                  isNearBottom ? 'bottom-0' : 'top-0'
+                                }`}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => handleOpenEditUser(user)}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left cursor-pointer font-semibold"
+                                >
+                                  <Edit3 size={14} className="text-blue-600" />
+                                  <span>Edit Role & Details</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingUserOrgsId(user.id);
+                                    setOpenMenuUserId(null);
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-3.5 py-2 text-slate-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-t border-slate-100 cursor-pointer font-semibold"
+                                >
+                                  <Building2 size={14} className="text-indigo-600" />
+                                  <span>Manage Organizations</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </td>
 
                         {/* Col 2: USER (Avatar Circle + Name + ID: #1038) */}
@@ -950,6 +1066,284 @@ export const UsersManagement: React.FC = () => {
                   Apply Columns
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* EDIT USER MODAL (EDIT ROLES, ORGS & USER DETAILS) */}
+      {/* ======================================================== */}
+      {isEditUserModalOpen && editingUser && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div 
+              className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+              onClick={() => setIsEditUserModalOpen(false)}
+            />
+
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-xl p-6 transform transition-all z-10 border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                    <UserIcon size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                      <span>Edit User — {editName}</span>
+                      <span className="text-[11px] font-normal text-slate-400 font-mono">ID: #{editingUser.id}</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Update role assignment, multi-organization membership, and details.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsEditUserModalOpen(false)}
+                  className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveEditUser} className="space-y-4 text-xs">
+                {/* Full Name & Email */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 font-semibold text-slate-900"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Email <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone, Role & Status */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="text"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      System Role <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={editRole}
+                        onChange={(e) => setEditRole(e.target.value as any)}
+                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer appearance-none pr-8 font-semibold text-blue-700"
+                      >
+                        <option value="PROVIDER">Provider</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="CREDENTIALING_SPECIALIST">Credentialing Specialist</option>
+                        <option value="ORG ADMIN">Org Admin</option>
+                        <option value="SUPER_ADMIN">Super Admin</option>
+                      </select>
+                      <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Account Status
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value as any)}
+                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer appearance-none pr-8 font-semibold text-slate-800"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                      </select>
+                      <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Multi-Select Organization Selection */}
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Assigned Organizations (Multi-Select) <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-blue-600 font-semibold">
+                      {editOrgs.length} selected
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                    {availableOrganizations.map((org) => {
+                      const isSelected = editOrgs.includes(org);
+                      return (
+                        <button
+                          key={org}
+                          type="button"
+                          onClick={() => {
+                            setEditOrgs(prev => {
+                              const updated = prev.includes(org) ? prev.filter(o => o !== org) : [...prev, org];
+                              return updated.length === 0 ? [org] : updated;
+                            });
+                          }}
+                          className={`p-2 rounded-lg border text-left text-xs flex items-center justify-between transition-all cursor-pointer ${
+                            isSelected 
+                              ? 'bg-blue-600 border-blue-600 text-white font-semibold shadow-2xs' 
+                              : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                          }`}
+                        >
+                          <span className="truncate">{org}</span>
+                          {isSelected && <Check size={13} className="shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Country & Service */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Country
+                    </label>
+                    <select
+                      value={editCountry}
+                      onChange={(e) => setNewUserCountry(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer"
+                    >
+                      <option value="United States">🇺🇸 United States</option>
+                      <option value="Canada">🇨🇦 Canada</option>
+                      <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                      <option value="Philippines">🇵🇭 Philippines</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Service
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. THERAPY, OCCUPATIONAL THERAPIST"
+                      value={editService}
+                      onChange={(e) => setEditService(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 uppercase font-semibold text-blue-700"
+                    />
+                  </div>
+                </div>
+
+                {/* Referred by & Onboarded by */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Referred by
+                    </label>
+                    <input
+                      type="text"
+                      value={editReferredBy}
+                      onChange={(e) => setEditReferredBy(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Onboarded by
+                    </label>
+                    <input
+                      type="text"
+                      value={editOnboardedBy}
+                      onChange={(e) => setEditOnboardedBy(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                {/* Ops Responsible & Start Dates */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Ops Responsible
+                    </label>
+                    <select
+                      value={editOpsResponsible}
+                      onChange={(e) => setEditOpsResponsible(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer font-semibold text-slate-800"
+                    >
+                      {availableSpecialists.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Credentialing Start Date
+                    </label>
+                    <input
+                      type="text"
+                      value={editCredStartDate}
+                      onChange={(e) => setEditCredStartDate(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                      Enrollment Start Date
+                    </label>
+                    <input
+                      type="text"
+                      value={editEnrollStartDate}
+                      onChange={(e) => setEditEnrollStartDate(e.target.value)}
+                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
+                    />
+                  </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditUserModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

@@ -147,6 +147,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
       return u;
     }));
+
+    if (updates.role) {
+      setRoles(prev => prev.map(r => {
+        const count = users.filter(u => (u.id === userId ? updates.role : u.role) === r.name).length;
+        return { ...r, userCount: count };
+      }));
+    }
   };
 
   const assignUserSpecialist = (userId: number, specialist: string) => {
