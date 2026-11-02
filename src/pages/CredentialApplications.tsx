@@ -45,10 +45,13 @@ export const CredentialApplications: React.FC = () => {
     providers,
     updateProviderStatus,
     assignProviderSpecialist,
+    updateProviderOnboardedBy,
     facilities,
     updateFacilityStatus,
     assignFacilitySpecialist,
+    updateFacilityOnboardedBy,
     availableSpecialists,
+    availableOnboarders,
     currentPersona,
     isAdmin,
     isSuperAdmin,
@@ -460,10 +463,30 @@ export const CredentialApplications: React.FC = () => {
                             case 'onboardedBy':
                               return (
                                 <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-                                    <UserCheck size={12} className="text-slate-400 shrink-0" />
-                                    <span>{item.onboardedBy || 'Self (Portal)'}</span>
-                                  </span>
+                                  {canManageAssignments ? (
+                                    <div className="relative inline-block text-left">
+                                      <select
+                                        value={item.onboardedBy || 'Self (Portal)'}
+                                        onChange={(e) => updateProviderOnboardedBy(item.id, e.target.value)}
+                                        className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                      >
+                                        {availableOnboarders.map((ob) => (
+                                          <option key={ob} value={ob}>
+                                            {ob}
+                                          </option>
+                                        ))}
+                                        {!availableOnboarders.includes(item.onboardedBy || '') && item.onboardedBy && (
+                                          <option value={item.onboardedBy}>{item.onboardedBy}</option>
+                                        )}
+                                      </select>
+                                      <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                    </div>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
+                                      <UserCheck size={12} className="text-slate-400 shrink-0" />
+                                      <span>{item.onboardedBy || 'Self (Portal)'}</span>
+                                    </span>
+                                  )}
                                 </td>
                               );
                             case 'opsResponsible':
@@ -703,10 +726,30 @@ export const CredentialApplications: React.FC = () => {
                             case 'onboardedBy':
                               return (
                                 <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-                                    <UserCheck size={12} className="text-slate-400 shrink-0" />
-                                    <span>{item.onboardedBy || 'Self (Portal)'}</span>
-                                  </span>
+                                  {canManageAssignments ? (
+                                    <div className="relative inline-block text-left">
+                                      <select
+                                        value={item.onboardedBy || 'Self (Portal)'}
+                                        onChange={(e) => updateFacilityOnboardedBy(item.id, e.target.value)}
+                                        className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                      >
+                                        {availableOnboarders.map((ob) => (
+                                          <option key={ob} value={ob}>
+                                            {ob}
+                                          </option>
+                                        ))}
+                                        {!availableOnboarders.includes(item.onboardedBy || '') && item.onboardedBy && (
+                                          <option value={item.onboardedBy}>{item.onboardedBy}</option>
+                                        )}
+                                      </select>
+                                      <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                    </div>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
+                                      <UserCheck size={12} className="text-slate-400 shrink-0" />
+                                      <span>{item.onboardedBy || 'Self (Portal)'}</span>
+                                    </span>
+                                  )}
                                 </td>
                               );
                             case 'opsResponsible':

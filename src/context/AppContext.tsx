@@ -15,6 +15,7 @@ import {
   RoleType,
   availableSpecialists,
   availableOrganizations,
+  availableOnboarders,
   DocumentRecord,
   initialDocuments
 } from '../data/mockData';
@@ -41,10 +42,12 @@ interface AppContextType {
   providers: ProviderApplication[];
   updateProviderStatus: (id: number, status: StatusType) => void;
   assignProviderSpecialist: (id: number, specialist: string) => void;
+  updateProviderOnboardedBy: (id: number, onboardedBy: string) => void;
   
   facilities: FacilityApplication[];
   updateFacilityStatus: (id: string, status: StatusType) => void;
   assignFacilitySpecialist: (id: string, specialist: string) => void;
+  updateFacilityOnboardedBy: (id: string, onboardedBy: string) => void;
   
   enrollments: EnrollmentRecord[];
   addEnrollment: (enrollment: Omit<EnrollmentRecord, 'id'>) => void;
@@ -57,6 +60,7 @@ interface AppContextType {
   assignDocumentSpecialist: (id: string, specialist: string) => void;
 
   availableSpecialists: string[];
+  availableOnboarders: string[];
   
   // Sidebar state
   sidebarCollapsed: boolean;
@@ -252,6 +256,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setFacilities(prev => prev.map(f => f.id === id ? { ...f, assignedSpecialist: specialist, opsResponsible: specialist } : f));
   };
 
+  const updateProviderOnboardedBy = (id: number, onboardedBy: string) => {
+    setProviders(prev => prev.map(p => p.id === id ? { ...p, onboardedBy } : p));
+  };
+
+  const updateFacilityOnboardedBy = (id: string, onboardedBy: string) => {
+    setFacilities(prev => prev.map(f => f.id === id ? { ...f, onboardedBy } : f));
+  };
+
   const addEnrollment = (data: Omit<EnrollmentRecord, 'id'>) => {
     const newRecord: EnrollmentRecord = {
       id: Math.floor(1000 + Math.random() * 90000),
@@ -309,9 +321,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         providers,
         updateProviderStatus,
         assignProviderSpecialist,
+        updateProviderOnboardedBy,
         facilities,
         updateFacilityStatus,
         assignFacilitySpecialist,
+        updateFacilityOnboardedBy,
         enrollments,
         addEnrollment,
         updateEnrollmentStatus,
@@ -321,6 +335,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateDocumentStatus,
         assignDocumentSpecialist,
         availableSpecialists,
+        availableOnboarders,
         sidebarCollapsed,
         setSidebarCollapsed,
         isSuperAdmin,

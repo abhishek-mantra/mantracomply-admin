@@ -14,13 +14,12 @@ import {
   Check,
   Building2,
   User as UserIcon,
-  UserCheck,
   GripVertical,
   Shield,
   Edit3
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { RoleDefinition, RoleType, availableSpecialists, availableOrganizations, UserRecord } from '../data/mockData';
+import { RoleDefinition, RoleType, availableSpecialists, availableOrganizations, availableOnboarders, UserRecord } from '../data/mockData';
 
 const complianceModules = [
   "Credential Applications",
@@ -835,10 +834,23 @@ export const UsersManagement: React.FC = () => {
                             case 'onboardedBy':
                               return (
                                 <td key={col.id} className={`py-3 px-4 whitespace-nowrap ${borderClass}`}>
-                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-                                    <UserCheck size={12} className="text-slate-400 shrink-0" />
-                                    <span>{user.onboardedBy || 'Sarah Jenkins'}</span>
-                                  </span>
+                                  <div className="relative inline-block text-left">
+                                    <select
+                                      value={user.onboardedBy || 'Sarah Jenkins'}
+                                      onChange={(e) => updateUser(user.id, { onboardedBy: e.target.value })}
+                                      className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    >
+                                      {availableOnboarders.map((ob) => (
+                                        <option key={ob} value={ob}>
+                                          {ob}
+                                        </option>
+                                      ))}
+                                      {!availableOnboarders.includes(user.onboardedBy || '') && user.onboardedBy && (
+                                        <option value={user.onboardedBy}>{user.onboardedBy}</option>
+                                      )}
+                                    </select>
+                                    <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                  </div>
                                 </td>
                               );
                             case 'opsResponsible':
@@ -1282,12 +1294,21 @@ export const UsersManagement: React.FC = () => {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       Onboarded by
                     </label>
-                    <input
-                      type="text"
-                      value={editOnboardedBy}
-                      onChange={(e) => setEditOnboardedBy(e.target.value)}
-                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 text-slate-800"
-                    />
+                    <div className="relative">
+                      <select
+                        value={editOnboardedBy}
+                        onChange={(e) => setEditOnboardedBy(e.target.value)}
+                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer font-semibold text-slate-800 appearance-none pr-8"
+                      >
+                        {availableOnboarders.map((ob) => (
+                          <option key={ob} value={ob}>{ob}</option>
+                        ))}
+                        {!availableOnboarders.includes(editOnboardedBy) && editOnboardedBy && (
+                          <option value={editOnboardedBy}>{editOnboardedBy}</option>
+                        )}
+                      </select>
+                      <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
 
@@ -1540,13 +1561,18 @@ export const UsersManagement: React.FC = () => {
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                       Onboarded by
                     </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Sarah Jenkins"
-                      value={newUserOnboardedBy}
-                      onChange={(e) => setNewUserOnboardedBy(e.target.value)}
-                      className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500"
-                    />
+                    <div className="relative">
+                      <select
+                        value={newUserOnboardedBy}
+                        onChange={(e) => setNewUserOnboardedBy(e.target.value)}
+                        className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:border-blue-500 bg-white cursor-pointer font-semibold text-slate-800 appearance-none pr-8"
+                      >
+                        {availableOnboarders.map((ob) => (
+                          <option key={ob} value={ob}>{ob}</option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
 

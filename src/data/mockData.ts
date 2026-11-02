@@ -216,6 +216,17 @@ export const availableSpecialists = [
   "Marcus Vance"
 ];
 
+export const availableOnboarders = [
+  "Self (Portal)",
+  "Sarah Jenkins",
+  "David Miller",
+  "Alex Chen",
+  "Anshul Gupta01",
+  "Abhishek Madan",
+  "Ops Intake",
+  "Admin"
+];
+
 export const defaultPersonas: Persona[] = [
   {
     id: "p1",
