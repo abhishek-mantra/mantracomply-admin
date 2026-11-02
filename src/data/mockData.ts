@@ -102,7 +102,7 @@ export const enrollmentStatusOptions: EnrollmentStatus[] = [
 
 export interface ClientActivity {
   id: string;
-  type: 'STAGE_UPDATED' | 'CALL_COMPLETED' | 'NOTE_ADDED';
+  type: 'STAGE_UPDATED' | 'VERIFICATION_COMPLETED' | 'NOTE_ADDED' | 'SANCTION_CHECK' | 'CAQH_ATTESTED' | 'DOCUMENT_VERIFIED';
   title: string;
   subtitle?: string;
   badgeText?: string;
@@ -391,7 +391,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     effectiveDate: "Oct 01, 2026",
     recredentialingDate: "Oct 01, 2028",
     providerInsuranceId: "VIT-UK-44910",
-    notes: "Contract executed. Provider recognition code issued and active for direct invoice settlement.",
+    notes: "Contract executed. Provider recognition code issued and active for in-network claims settlement.",
     date: "Sep 8, 2026",
     insurance: "Vitality",
     assignedSpecialist: "David Miller"
@@ -413,7 +413,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     effectiveDate: "Sep 25, 2026",
     recredentialingDate: "Sep 25, 2028",
     providerInsuranceId: "WPA-PR-90214",
-    notes: "Approved under Dietitian recognized provider roster. Invoicing live.",
+    notes: "Approved under Dietitian recognized provider roster. Active in-network credentialing finalized.",
     date: "Sep 8, 2026",
     insurance: "WPA",
     assignedSpecialist: "David Miller"
@@ -435,7 +435,7 @@ export const initialEnrollments: EnrollmentRecord[] = [
     effectiveDate: "Oct 15, 2026",
     recredentialingDate: "Oct 15, 2028",
     providerInsuranceId: "AVV-UK-77312",
-    notes: "Fee schedule agreement accepted. Direct settlement enabled.",
+    notes: "Fee schedule agreement accepted. Participating provider enrollment enabled.",
     date: "Sep 8, 2026",
     insurance: "Aviva",
     assignedSpecialist: "David Miller"

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   X, 
@@ -10,7 +10,8 @@ import {
   Plus, 
   CheckCircle2, 
   Clock, 
-  PhoneCall, 
+  ShieldCheck,
+  FileCheck,
   MessageSquare, 
   Info, 
   User, 
@@ -74,31 +75,49 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
   const [currentStatus, setCurrentStatus] = useState<string>(client.status);
   const [responsibleUser, setResponsibleUser] = useState(client.responsibleUser || client.assignedSpecialist || availableSpecialists[0]);
 
-  // Activity & Notes state (Right column)
+  // Activity & Notes state (Right column) - Healthcare Compliance & Credentialing
   const [noteText, setNoteText] = useState('');
   const [noteType, setNoteType] = useState<'ACTIVITY' | 'NOTE'>('NOTE');
+  const [activityFilter, setActivityFilter] = useState<'ALL' | 'STAGE_UPDATED' | 'VERIFICATION_COMPLETED' | 'NOTE_ADDED'>('ALL');
   const [activities, setActivities] = useState<ClientActivity[]>(client.activities || [
     {
       id: 'act-1',
       type: 'STAGE_UPDATED',
       title: 'Stage Updated',
-      subtitle: `${client.status} via Pipeline Automation • Payer Portal Queue`,
+      subtitle: `${client.status} via Payer Credentialing & Enrollment Pipeline`,
       badgeText: client.status,
       timestamp: 'Oct 31, 2026, 2:58 PM'
     },
     {
       id: 'act-2',
-      type: 'CALL_COMPLETED',
-      title: 'Outbound Call Completed',
-      subtitle: 'Scheduled via Voice Assistant with Provider Relations',
-      timestamp: 'Oct 31, 2026, 2:58 PM'
+      type: 'VERIFICATION_COMPLETED',
+      title: 'Primary Source Verification (PSV) Completed',
+      subtitle: 'State Medical License & Board Certification verified with active standing and zero disciplinary actions.',
+      badgeText: 'VERIFIED',
+      timestamp: 'Oct 31, 2026, 11:30 AM'
     },
     {
       id: 'act-3',
+      type: 'SANCTION_CHECK',
+      title: 'OIG & SAM Exclusion Screening Cleared',
+      subtitle: 'Automated exclusion check confirmed provider is in good standing with zero federal or state sanctions.',
+      badgeText: 'CLEARED',
+      timestamp: 'Oct 30, 2026, 3:15 PM'
+    },
+    {
+      id: 'act-4',
+      type: 'CAQH_ATTESTED',
+      title: 'CAQH ProView Profile Attestation Verified',
+      subtitle: 'CAQH credentialing data attested by provider; dossier synchronized for payer contracting review.',
+      badgeText: 'CAQH ATTESTED',
+      timestamp: 'Oct 29, 2026, 9:45 AM'
+    },
+    {
+      id: 'act-5',
       type: 'NOTE_ADDED',
-      title: 'Note Added',
-      subtitle: `Note by System Specialist: ${client.notes || 'Client application created and assigned.'}`,
-      timestamp: 'Oct 31, 2026, 2:58 PM'
+      title: 'Credentialing Compliance Note Added',
+      subtitle: `Note by ${client.responsibleUser || client.assignedSpecialist || 'Sarah Jenkins'}: ${client.notes || 'Enrollment dossier verified. Submitted to payer contracting committee for panel review.'}`,
+      timestamp: 'Oct 28, 2026, 2:10 PM'
     }
   ]);
 
@@ -138,6 +157,39 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
   const [docSearch, setDocSearch] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState(false);
+
+  // Sync state whenever client prop updates
+  useEffect(() => {
+    setName(client.providerName);
+    setCategory(client.category || 'Providers');
+    setEmail(client.email || `${client.providerName.toLowerCase().replace(/\s+/g, '.')}@mantra.care`);
+    setPhone(client.phone || '+1 6402869150');
+    setTimezone(client.timezone || 'America/New_York (EST)');
+    setInquiryType(client.service);
+    setOrganization(client.organization);
+    setStateName(client.state || 'FL');
+    setPayer(client.payer || client.insurance || 'Aetna');
+    setPayerNetwork(client.payerNetwork || 'Commercial HMO/PPO Network');
+    setReferenceNumber(client.referenceNumber || 'REF-AET-99214');
+    setPlanType(client.type || 'Commercial');
+    setApplicationType(client.applicationType || 'Online Roster');
+    setMedicalGroup(client.medicalGroup || `${client.organization} Medical Group`);
+    setStartDate(client.startDate || '09/15/2026');
+    setSubmissionDate(client.dateOfSubmission || client.date || '10/22/2026');
+    setApprovalDate(client.approvalDate || '10/30/2026');
+    setResubmittedDate(client.resubmittedDate || '—');
+    setRevalidationDate(client.recredentialingDate || '09/28/2028');
+    setEffectiveDate(client.effectiveDate || '09/29/2026');
+    setFollowUpDate(client.followUpDate || '11/14/2026');
+    setCurrentStatus(client.status);
+    setResponsibleUser(client.responsibleUser || client.assignedSpecialist || availableSpecialists[0]);
+    if (client.activities && client.activities.length > 0) {
+      setActivities(client.activities);
+    }
+    if (client.documents && client.documents.length > 0) {
+      setDocuments(client.documents);
+    }
+  }, [client]);
 
   // Save changes handler
   const handleSaveGeneral = () => {
@@ -185,8 +237,8 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
     const newAct: ClientActivity = {
       id: `act-${Date.now()}`,
       type: noteType === 'NOTE' ? 'NOTE_ADDED' : 'STAGE_UPDATED',
-      title: noteType === 'NOTE' ? 'Note Added' : 'Activity Recorded',
-      subtitle: `Note by Specialist: ${noteText.trim()}`,
+      title: noteType === 'NOTE' ? 'Credentialing Note Added' : 'Compliance Activity Recorded',
+      subtitle: `Logged by ${responsibleUser || 'Compliance Specialist'}: ${noteText.trim()}`,
       timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
     };
 
@@ -209,7 +261,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
       id: `act-${Date.now()}`,
       type: 'STAGE_UPDATED',
       title: 'Stage Updated',
-      subtitle: `${newStage} via Pipeline Workflow`,
+      subtitle: `${newStage} via Payer Credentialing & Enrollment Pipeline`,
       badgeText: newStage,
       timestamp: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
     };
@@ -837,7 +889,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                       rows={3}
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
-                      placeholder="Record new client activity or note..."
+                      placeholder="Record compliance activity, PSV verification update, or note..."
                       className="w-full p-3 border border-slate-200 rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:border-blue-500 resize-none bg-slate-50/50"
                     />
 
@@ -877,53 +929,86 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
                     </div>
                   </div>
 
-                  {/* Activity Timeline List (Screenshot 2) */}
+                  {/* Activity Timeline List (Healthcare Compliance & Credentialing Events) */}
                   <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs space-y-4">
                     <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                       <div className="text-xs font-bold uppercase tracking-wider text-slate-800">
                         Activity Timeline ({activities.length})
                       </div>
-                      <button className="text-[11px] font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1 cursor-pointer">
-                        <span>All Events</span>
-                        <ChevronDown size={12} />
-                      </button>
+                      <div className="relative">
+                        <select
+                          value={activityFilter}
+                          onChange={(e) => setActivityFilter(e.target.value as any)}
+                          className="text-[11px] font-semibold text-slate-600 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 hover:bg-slate-100 cursor-pointer focus:outline-none appearance-none pr-6"
+                        >
+                          <option value="ALL">All Events</option>
+                          <option value="STAGE_UPDATED">Stage Updates</option>
+                          <option value="VERIFICATION_COMPLETED">Compliance & Verifications</option>
+                          <option value="NOTE_ADDED">Notes</option>
+                        </select>
+                        <ChevronDown size={11} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                      </div>
                     </div>
 
                     <div className="space-y-4">
-                      {activities.map((act) => {
-                        let iconColor = 'bg-blue-600 text-white';
-                        let IconComponent = Clock;
-                        if (act.type === 'CALL_COMPLETED') {
-                          iconColor = 'bg-emerald-600 text-white';
-                          IconComponent = PhoneCall;
-                        } else if (act.type === 'NOTE_ADDED') {
-                          iconColor = 'bg-purple-600 text-white';
-                          IconComponent = MessageSquare;
-                        }
+                      {activities
+                        .filter((act) => {
+                          if (activityFilter === 'ALL') return true;
+                          if (activityFilter === 'STAGE_UPDATED') return act.type === 'STAGE_UPDATED';
+                          if (activityFilter === 'VERIFICATION_COMPLETED') return act.type === 'VERIFICATION_COMPLETED' || act.type === 'SANCTION_CHECK' || act.type === 'CAQH_ATTESTED';
+                          if (activityFilter === 'NOTE_ADDED') return act.type === 'NOTE_ADDED';
+                          return true;
+                        })
+                        .map((act) => {
+                          let iconColor = 'bg-blue-600 text-white';
+                          let IconComponent = Clock;
+                          let badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
 
-                        return (
-                          <div key={act.id} className="flex items-start gap-3 text-xs">
-                            <div className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center ${iconColor} shadow-2xs mt-0.5`}>
-                              <IconComponent size={13} />
-                            </div>
+                          if (act.type === 'VERIFICATION_COMPLETED') {
+                            iconColor = 'bg-emerald-600 text-white';
+                            IconComponent = ShieldCheck;
+                            badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                          } else if (act.type === 'SANCTION_CHECK') {
+                            iconColor = 'bg-teal-600 text-white';
+                            IconComponent = FileCheck;
+                            badgeColor = 'bg-teal-50 text-teal-700 border-teal-200';
+                          } else if (act.type === 'CAQH_ATTESTED') {
+                            iconColor = 'bg-indigo-600 text-white';
+                            IconComponent = FileText;
+                            badgeColor = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                          } else if (act.type === 'NOTE_ADDED') {
+                            iconColor = 'bg-purple-600 text-white';
+                            IconComponent = MessageSquare;
+                            badgeColor = 'bg-purple-50 text-purple-700 border-purple-200';
+                          } else if (act.type === 'STAGE_UPDATED') {
+                            iconColor = 'bg-blue-600 text-white';
+                            IconComponent = Clock;
+                            badgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+                          }
 
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="font-bold text-slate-900 truncate">{act.title}</span>
-                                <span className="text-[10px] text-slate-400 shrink-0 font-medium">{act.timestamp}</span>
+                          return (
+                            <div key={act.id} className="flex items-start gap-3 text-xs">
+                              <div className={`w-7 h-7 rounded-full shrink-0 flex items-center justify-center ${iconColor} shadow-2xs mt-0.5`}>
+                                <IconComponent size={13} />
                               </div>
-                              <p className="text-slate-600 text-[11px] mt-0.5 leading-relaxed break-words">
-                                {act.subtitle}
-                              </p>
-                              {act.badgeText && (
-                                <span className="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 font-semibold text-[10px] rounded border border-blue-100 uppercase">
-                                  {act.badgeText}
-                                </span>
-                              )}
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-bold text-slate-900 truncate">{act.title}</span>
+                                  <span className="text-[10px] text-slate-400 shrink-0 font-medium">{act.timestamp}</span>
+                                </div>
+                                <p className="text-slate-600 text-[11px] mt-0.5 leading-relaxed break-words">
+                                  {act.subtitle}
+                                </p>
+                                {act.badgeText && (
+                                  <span className={`inline-block mt-1 px-2 py-0.5 font-semibold text-[10px] rounded border uppercase tracking-wider ${badgeColor}`}>
+                                    {act.badgeText}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
