@@ -14,7 +14,9 @@ import {
   initialEnrollments, 
   RoleType,
   availableSpecialists,
-  availableOrganizations
+  availableOrganizations,
+  DocumentRecord,
+  initialDocuments
 } from '../data/mockData';
 import { StatusType } from '../components/StatusBadge';
 
@@ -50,6 +52,10 @@ interface AppContextType {
   assignEnrollmentSpecialist: (id: number, specialist: string) => void;
   updateEnrollmentDetails: (id: number, updates: Partial<EnrollmentRecord>) => void;
 
+  documents: DocumentRecord[];
+  updateDocumentStatus: (id: string, status: StatusType) => void;
+  assignDocumentSpecialist: (id: string, specialist: string) => void;
+
   availableSpecialists: string[];
   
   // Sidebar state
@@ -73,6 +79,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [providers, setProviders] = useState<ProviderApplication[]>(initialProviders);
   const [facilities, setFacilities] = useState<FacilityApplication[]>(initialFacilities);
   const [enrollments, setEnrollments] = useState<EnrollmentRecord[]>(initialEnrollments);
+  const [documents, setDocuments] = useState<DocumentRecord[]>(initialDocuments);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
   const switchPersona = (personaId: string) => {
@@ -197,6 +204,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Synchronize or create enrollment application
     const targetProvider = providers.find(p => p.id === id);
     if (targetProvider) {
+      setDocuments(prev => prev.map(d => {
+        if (d.userName.toLowerCase() === targetProvider.name.toLowerCase()) {
+          return { ...d, opsResponsible: specialist };
+        }
+        return d;
+      }));
+
       setEnrollments(prev => {
         const existing = prev.find(e => e.providerName === targetProvider.name);
         if (existing) {
@@ -261,6 +275,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setEnrollments(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
   };
 
+  const updateDocumentStatus = (id: string, status: StatusType) => {
+    setDocuments(prev => prev.map(d => d.id === id ? { ...d, status: status as any } : d));
+  };
+
+  const assignDocumentSpecialist = (id: string, specialist: string) => {
+    setDocuments(prev => prev.map(d => d.id === id ? { ...d, opsResponsible: specialist } : d));
+  };
+
   const isSuperAdmin = currentPersona.role === 'SUPER_ADMIN';
   const isAdmin = currentPersona.role === 'ADMIN' || isSuperAdmin;
   const isSpecialist = currentPersona.role === 'CREDENTIALING_SPECIALIST';
@@ -295,6 +317,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateEnrollmentStatus,
         assignEnrollmentSpecialist,
         updateEnrollmentDetails,
+        documents,
+        updateDocumentStatus,
+        assignDocumentSpecialist,
         availableSpecialists,
         sidebarCollapsed,
         setSidebarCollapsed,

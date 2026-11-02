@@ -7,19 +7,33 @@ import {
   ChevronLeft, 
   ChevronRight, 
   ChevronsLeft, 
-  ChevronsRight 
+  ChevronsRight,
+  UserCheck
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { initialDocuments, DocumentRecord } from '../data/mockData';
+import { DocumentRecord } from '../data/mockData';
 import { StatusBadge, StatusType } from '../components/StatusBadge';
 import { DocumentPreviewModal } from '../components/DocumentPreviewModal';
 
 export const DocumentVerification: React.FC = () => {
-  const { currentPersona, isAssignedOnly, providers } = useApp();
-  const [documents, setDocuments] = useState<DocumentRecord[]>(initialDocuments);
+  const { 
+    currentPersona, 
+    isAssignedOnly, 
+    isAdmin, 
+    isSuperAdmin, 
+    providers, 
+    documents, 
+    updateDocumentStatus, 
+    assignDocumentSpecialist,
+    availableSpecialists
+  } = useApp();
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [specialistFilter, setSpecialistFilter] = useState('ALL');
   const [selectedDoc, setSelectedDoc] = useState<DocumentRecord | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const canManageAssignments = isSuperAdmin || isAdmin;
 
   // Names of providers assigned to this specialist
   const assignedProviderNames = useMemo(() => {
@@ -29,24 +43,41 @@ export const DocumentVerification: React.FC = () => {
   }, [providers, currentPersona.name]);
 
   const handleStatusChange = (id: string, newStatus: StatusType) => {
-    setDocuments(prev => 
-      prev.map(doc => doc.id === id ? { ...doc, status: newStatus as any } : doc)
-    );
+    updateDocumentStatus(id, newStatus);
+    if (selectedDoc && selectedDoc.id === id) {
+      setSelectedDoc(prev => prev ? { ...prev, status: newStatus as any } : null);
+    }
+  };
+
+  const handleOpsResponsibleChange = (id: string, specialist: string) => {
+    assignDocumentSpecialist(id, specialist);
+    if (selectedDoc && selectedDoc.id === id) {
+      setSelectedDoc(prev => prev ? { ...prev, opsResponsible: specialist } : null);
+    }
   };
 
   const filteredDocs = useMemo(() => {
     return documents.filter(doc => {
+      const docSpecialist = doc.opsResponsible || 'Sarah Jenkins';
+
       // Data isolation for specialist
-      if (isAssignedOnly && !assignedProviderNames.includes(doc.userName.toLowerCase())) {
+      if (isAssignedOnly && docSpecialist !== currentPersona.name && !assignedProviderNames.includes(doc.userName.toLowerCase())) {
         return false;
       }
+
+      // Admin filter by specialist
+      if ((isAdmin || isSuperAdmin) && specialistFilter !== 'ALL' && docSpecialist !== specialistFilter) {
+        return false;
+      }
+
       const matchSearch = searchTerm === '' ||
         doc.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.documentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doc.documentType.toLowerCase().includes(searchTerm.toLowerCase());
+        doc.documentType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        docSpecialist.toLowerCase().includes(searchTerm.toLowerCase());
       return matchSearch;
     });
-  }, [documents, searchTerm, isAssignedOnly, assignedProviderNames]);
+  }, [documents, searchTerm, isAssignedOnly, assignedProviderNames, isAdmin, isSuperAdmin, specialistFilter, currentPersona.name]);
 
   return (
     <div className="space-y-6">
@@ -84,11 +115,28 @@ export const DocumentVerification: React.FC = () => {
             <ChevronDown size={13} />
           </button>
 
+          {/* Admin Specialist Filter Dropdown */}
+          {(isAdmin || isSuperAdmin) && (
+            <div className="relative">
+              <select
+                value={specialistFilter}
+                onChange={(e) => setSpecialistFilter(e.target.value)}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none appearance-none pr-7"
+              >
+                <option value="ALL">All Specialists</option>
+                {availableSpecialists.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2.5 pointer-events-none" />
+            </div>
+          )}
+
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search documents or users..."
+            placeholder="Search documents, users or ops responsible..."
             className="w-full text-sm text-slate-700 placeholder-slate-400 focus:outline-none bg-transparent"
           />
         </div>
@@ -109,6 +157,7 @@ export const DocumentVerification: React.FC = () => {
                 <th className="py-4 px-5">Document</th>
                 <th className="py-4 px-4">Expiry Date</th>
                 <th className="py-4 px-4">Document Type</th>
+                <th className="py-4 px-4">Ops Responsible</th>
                 <th className="py-4 px-4 text-center">Status</th>
                 <th className="py-4 px-5 text-center">Actions</th>
               </tr>
@@ -139,6 +188,29 @@ export const DocumentVerification: React.FC = () => {
                   </td>
                   <td className="py-4 px-4 text-xs font-semibold text-slate-700 tracking-tight">
                     {item.documentType}
+                  </td>
+                  <td className="py-4 px-4 whitespace-nowrap">
+                    {canManageAssignments ? (
+                      <div className="relative inline-block text-left">
+                        <select
+                          value={item.opsResponsible || 'Sarah Jenkins'}
+                          onChange={(e) => handleOpsResponsibleChange(item.id, e.target.value)}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer appearance-none pr-6 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        >
+                          {availableSpecialists.map((specialist) => (
+                            <option key={specialist} value={specialist}>
+                              {specialist}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown size={12} className="text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                      </div>
+                    ) : (
+                      <span className="font-semibold text-slate-800 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-xs inline-flex items-center gap-1.5">
+                        <UserCheck size={12} className="text-slate-400 shrink-0" />
+                        <span>{item.opsResponsible || 'Sarah Jenkins'}</span>
+                      </span>
+                    )}
                   </td>
                   <td className="py-4 px-4 text-center">
                     <StatusBadge

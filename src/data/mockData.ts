@@ -76,6 +76,7 @@ export interface DocumentRecord {
   expiryDate: string;
   documentType: string;
   status: 'PENDING' | 'VERIFIED' | 'UNVERIFIED' | 'RESUBMITTED';
+  opsResponsible?: string;
 }
 
 export type EnrollmentStatus = 
@@ -362,17 +363,17 @@ export const initialFacilities: FacilityApplication[] = [
 ];
 
 export const initialDocuments: DocumentRecord[] = [
-  { id: "d1", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Signed W9 Form", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "RESUBMITTED" },
-  { id: "d2", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Diploma Transcript", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "RESUBMITTED" },
-  { id: "d3", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Board Certificate", expiryDate: "Dec 31, 2029", documentType: "BOARD CERTIFICATE/PDF", status: "RESUBMITTED" },
-  { id: "d4", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Oct 30, 2026", documentType: "LICENSE/PDF", status: "RESUBMITTED" },
-  { id: "d5", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Malpractice Insurance", expiryDate: "Jun 26, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "RESUBMITTED" },
-  { id: "d6", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Apr 30, 2027", documentType: "LICENSE/PDF", status: "VERIFIED" },
-  { id: "d7", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Sep 30, 2028", documentType: "LICENSE/PDF", status: "VERIFIED" },
-  { id: "d8", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Malpractice Insurance", expiryDate: "Oct 26, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "VERIFIED" },
-  { id: "d9", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Diploma Transcript", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "VERIFIED" },
-  { id: "d10", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Signed W9 Form", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "VERIFIED" },
-  { id: "d11", userName: "Jodhi Wood Gaudet", uploadDate: "Oct 26, 2026", documentName: "Malpractice Insurance", expiryDate: "May 1, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "PENDING" }
+  { id: "d1", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Signed W9 Form", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "RESUBMITTED", opsResponsible: "Sarah Jenkins" },
+  { id: "d2", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Diploma Transcript", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "RESUBMITTED", opsResponsible: "Sarah Jenkins" },
+  { id: "d3", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Board Certificate", expiryDate: "Dec 31, 2029", documentType: "BOARD CERTIFICATE/PDF", status: "RESUBMITTED", opsResponsible: "Sarah Jenkins" },
+  { id: "d4", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Oct 30, 2026", documentType: "LICENSE/PDF", status: "RESUBMITTED", opsResponsible: "Sarah Jenkins" },
+  { id: "d5", userName: "Morgen-Ashlee Backus", uploadDate: "Oct 27, 2026", documentName: "Malpractice Insurance", expiryDate: "Jun 26, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "RESUBMITTED", opsResponsible: "Sarah Jenkins" },
+  { id: "d6", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Apr 30, 2027", documentType: "LICENSE/PDF", status: "VERIFIED", opsResponsible: "Sarah Jenkins" },
+  { id: "d7", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "License", expiryDate: "Sep 30, 2028", documentType: "LICENSE/PDF", status: "VERIFIED", opsResponsible: "Sarah Jenkins" },
+  { id: "d8", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Malpractice Insurance", expiryDate: "Oct 26, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "VERIFIED", opsResponsible: "Sarah Jenkins" },
+  { id: "d9", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Diploma Transcript", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "VERIFIED", opsResponsible: "Sarah Jenkins" },
+  { id: "d10", userName: "John Zavaiydriga", uploadDate: "Oct 27, 2026", documentName: "Signed W9 Form", expiryDate: "—", documentType: "DOCUMENT/PDF", status: "VERIFIED", opsResponsible: "Sarah Jenkins" },
+  { id: "d11", userName: "Jodhi Wood Gaudet", uploadDate: "Oct 26, 2026", documentName: "Malpractice Insurance", expiryDate: "May 1, 2027", documentType: "MALPRACTICE INSURANCE/PDF", status: "PENDING", opsResponsible: "David Miller" }
 ];
 
 export const initialEnrollments: EnrollmentRecord[] = [

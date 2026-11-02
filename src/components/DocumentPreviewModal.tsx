@@ -63,6 +63,7 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
               <h4 className="text-base font-bold text-slate-800">{document.documentName}</h4>
               <p className="text-xs text-slate-400 mt-1">Provider: <span className="font-semibold text-slate-700">{document.userName}</span></p>
               <p className="text-xs text-slate-400">Validity: <span className="font-semibold text-slate-700">{document.expiryDate}</span></p>
+              <p className="text-xs text-slate-400">Ops Responsible: <span className="font-semibold text-slate-700">{document.opsResponsible || 'Sarah Jenkins'}</span></p>
             </div>
 
             <div className="py-6 px-4 bg-slate-50 rounded-lg border border-dashed border-slate-200 text-xs text-slate-500 leading-relaxed">
