@@ -52,7 +52,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
   // Payer Details (Screenshot 3)
   const [payer, setPayer] = useState(client.payer || client.insurance || 'Aetna');
   const [payerNetwork, setPayerNetwork] = useState(client.payerNetwork || `${client.payer} Medicare Advantage`);
-  const [planType, setPlanType] = useState(client.type || 'Commercial');
+  const [planType, setPlanType] = useState(client.type || 'Individual');
   const [applicationType, setApplicationType] = useState(client.applicationType || 'Online Roster');
   const [medicalGroup, setMedicalGroup] = useState(client.medicalGroup || `${client.organization} Medical Group`);
 
@@ -171,7 +171,7 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
     setPayer(client.payer || client.insurance || 'Aetna');
     setPayerNetwork(client.payerNetwork || 'Commercial HMO/PPO Network');
     setReferenceNumber(client.referenceNumber || 'REF-AET-99214');
-    setPlanType(client.type || 'Commercial');
+    setPlanType(client.type || 'Individual');
     setApplicationType(client.applicationType || 'Online Roster');
     setMedicalGroup(client.medicalGroup || `${client.organization} Medical Group`);
     setStartDate(client.startDate || '09/15/2026');
@@ -635,17 +635,15 @@ export const ClientDetailDrawer: React.FC<ClientDetailDrawerProps> = ({
 
                         <div>
                           <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                            Plan Type
+                            Type
                           </label>
                           <select
                             value={planType}
                             onChange={(e) => setPlanType(e.target.value)}
                             className="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-blue-500 cursor-pointer bg-white"
                           >
-                            <option value="Commercial">Commercial</option>
-                            <option value="Medicare">Medicare</option>
-                            <option value="Medicaid">Medicaid</option>
-                            <option value="Managed Care">Managed Care</option>
+                            <option value="Individual">Individual</option>
+                            <option value="Under Group">Under Group</option>
                           </select>
                         </div>
 

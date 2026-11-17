@@ -201,7 +201,7 @@ export const EnrollmentApplications: React.FC = () => {
   const [selectedProviderId, setSelectedProviderId] = useState<string>('');
   const [payer, setPayer] = useState('Aetna');
   const [customPayer, setCustomPayer] = useState('');
-  const [payerType, setPayerType] = useState('Commercial');
+  const [payerType, setPayerType] = useState('Individual');
   const [stateName, setStateName] = useState('FL');
   const priority: 'High' | 'Medium' | 'Low' = 'Medium';
   const modalStatus = 'Pending';
@@ -231,6 +231,7 @@ export const EnrollmentApplications: React.FC = () => {
     
     setNotes('');
     setCustomPayer('');
+    setPayerType('Individual');
     setIsAddModalOpen(true);
   };
 
@@ -509,7 +510,7 @@ export const EnrollmentApplications: React.FC = () => {
                         case 'type':
                           return (
                             <td key={col.id} className={`py-3 px-4 text-slate-700 whitespace-nowrap ${stickyClass}`}>
-                              {item.type || 'Commercial'}
+                              {item.type || 'Individual'}
                             </td>
                           );
                         case 'payer':
@@ -800,12 +801,8 @@ export const EnrollmentApplications: React.FC = () => {
                             onChange={(e) => setPayerType(e.target.value)}
                             className="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer appearance-none pr-8"
                           >
-                            <option value="Commercial">Commercial</option>
-                            <option value="Medicare">Medicare</option>
-                            <option value="Medicaid">Medicaid</option>
-                            <option value="Managed Care">Managed Care</option>
-                            <option value="TriCare">TriCare</option>
-                            <option value="Private Insurance">Private Insurance</option>
+                            <option value="Individual">Individual</option>
+                            <option value="Under Group">Under Group</option>
                           </select>
                           <ChevronDown size={14} className="text-slate-400 absolute right-3 top-3 pointer-events-none" />
                         </div>

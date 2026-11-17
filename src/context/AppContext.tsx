@@ -226,7 +226,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             organization: targetProvider.organization,
             service: targetProvider.service,
             state: "New York (NY)",
-            type: "Commercial",
+            type: "Individual",
             payer: "Aetna (Primary)",
             priority: "Standard",
             status: "PENDING",
